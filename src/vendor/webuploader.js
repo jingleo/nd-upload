@@ -1,5 +1,4 @@
-/*! WebUploader 0.1.5 */
-
+/*! WebUploader 0.1.6 */
 
 /**
  * @fileOverview 让内部各个部件的代码可以用[amd](https://github.com/amdjs/amdjs-api/wiki/AMD)模块定义方式组织起来。
@@ -106,7 +105,8 @@
         origin;
 
     if ( typeof module === 'object' && typeof module.exports === 'object' ) {
-
+        // liwenfu@crossjs.com 2015/3/27 13:49:05
+        // 默认引入 jquery
         // For CommonJS and CommonJS-like environments where a proper window is present,
         module.exports = makeExport(require('jquery'));
     } else if ( typeof define === 'function' && define.amd ) {
@@ -215,14 +215,14 @@
         }
 
         function createObject( proto ) {
-            var f;
+            var F;
 
             if ( Object.create ) {
                 return Object.create( proto );
             } else {
-                f = function() {};
-                f.prototype = proto;
-                return new f();
+                F = function() {};
+                F.prototype = proto;
+                return new F();
             }
         }
 
@@ -236,7 +236,7 @@
             /**
              * @property {String} version 当前版本号。
              */
-            version: '0.1.5',
+            version: '0.1.6',
 
             /**
              * @property {jQuery|Zepto} $ 引用依赖的jQuery或者Zepto对象。
@@ -1433,7 +1433,7 @@
             // 删除指定的插件。
             for ( var i = widgetClass.length; i--; ) {
                 if ( widgetClass[i]._name === name ) {
-                    widgetClass.splice(i, 1)
+                    widgetClass.splice(i, 1);
                 }
             }
         };
@@ -1921,6 +1921,9 @@
                     picker.once( 'ready', deferred.resolve );
                     picker.on( 'select', function( files ) {
                         me.owner.request( 'add-file', [ files ]);
+                    });
+                    picker.on('dialogopen', function() {
+                        me.owner.trigger('dialogOpen', picker.button);
                     });
                     picker.init();
 
@@ -4712,6 +4715,9 @@
                 } catch( err ) {
                 }
 
+                me.dndOver = false;
+                me.elem.removeClass( prefix + 'over' );
+
                 if ( data ) {
                     return;
                 }
@@ -4722,8 +4728,6 @@
                     }) );
                 });
 
-                me.dndOver = false;
-                me.elem.removeClass( prefix + 'over' );
                 return false;
             },
 
@@ -4906,6 +4910,7 @@
 
                 label.on( 'click', function() {
                     input.trigger('click');
+                    owner.trigger('dialogopen');
                 });
 
                 label.css({
@@ -6494,12 +6499,12 @@
 
                 // setter
                 if ( val ) {
-                    this._meta = val;
+                    this._metas = val;
                     return this;
                 }
 
                 // getter
-                return this._meta;
+                return this._metas;
             },
 
             destroy: function() {
@@ -6754,6 +6759,7 @@
             })()
         });
     });
+
     /**
      * @fileOverview Transport
      * @todo 支持chunked传输，优势：
@@ -7917,8 +7923,12 @@
                         //     me._responseJson = xhr.exec('getResponseAsJson');
                         // } catch ( error ) {
 
-                        p = window.JSON && window.JSON.parse || function( s ) {
+                        p = function( s ) {
                             try {
+                                if (window.JSON && window.JSON.parse) {
+                                    return JSON.parse(s);
+                                }
+
                                 return new Function('return ' + s).call();
                             } catch ( err ) {
                                 return {};
@@ -7952,6 +7962,7 @@
             }
         });
     });
+
     /**
      * @fileOverview Blob Html实现
      */

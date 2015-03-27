@@ -102,12 +102,11 @@ module.exports = function() {
       width: 100,
       height: 100,
       quality: 100,
-      type: ''
+      // 必须 jpeg 否则 flash 环境下无法显示 png
+      type: 'jpeg'
     },
 
-    // swf: '/static/spm_modules/nd-upload/1.0.0/src/vendor/uploader.swf',
     swf: host.get('swf'),
-    // server: '',
     server: host.get('server'),
     // runtimeOrder: 'flash, html5',
     accept: host.get('accept'),

@@ -1,6 +1,6 @@
 /**
- * Description: index.js
- * Author: LinNing <565153851@qq.com>
+ * Description: 基于 WebUploader 的上传组件
+ * Author: crossjs <liwenfu@crossjs.com>
  * Date: 2015-01-16 14:52:39
  */
 
@@ -167,13 +167,15 @@ module.exports = Widget.extend({
     this.once('uploadFinished', function() {
       var hasErr = false;
 
-      if (that.get('required') && !that.values.length) {
-        hasErr = true;
-      } else {
+      if (that.values.length) {
         if (that.get('multiple')) {
           that.get('trigger').value = JSON.stringify(that.values);
         } else {
           that.get('trigger').value = that.values.slice(-1);
+        }
+      } else {
+        if (that.get('required')) {
+          hasErr = true;
         }
       }
 

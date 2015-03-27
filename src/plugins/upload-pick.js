@@ -20,7 +20,9 @@ module.exports = function() {
       id: host.element[0],
       innerHTML: '选择',
       button: pickElem,
-      multiple: host.get('multiple')
+      multiple: host.get('multiple'),
+      // 移除默认 name="file"
+      name: null
     }, host.get('pick')));
 
   var maxcount = host.get('maxcount');
