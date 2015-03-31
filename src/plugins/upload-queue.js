@@ -8,6 +8,8 @@
 var UploadQueue = require('../modules/upload-queue');
 var UploadFile = require('../modules/upload-file');
 
+var BLANK = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
+
 module.exports = function() {
   var plugin = this,
     host = plugin.host;
@@ -21,33 +23,61 @@ module.exports = function() {
     }
   }).render();
 
+  var optThumb = uploader.option('thumb');
+
   /* helpers */
   function appendFile(file) {
+    file.width = optThumb.width;
+    file.height = optThumb.height;
+
     uploadQueue.append(new UploadFile({
       model: file
     }).before('destroy', function() {
-      // model === WUFile
-      uploader.removeFile(this.get('model'), true);
+      // model === WUFile === file === this.get('model')
+      if (/^image\//.test(file.type)) {
+        uploader.removeFile(file, true);
+      } else {
+        host.trigger('fileDequeued', file);
+      }
     }).render());
   }
 
+  // 缩略图
   host.on('fileQueued', function(file) {
-    // 缩略图
+    // 来自上传
     if (/^image\//.test(file.type)) {
-      host.getPlugin('uploadCore')
-          .exports
-          .makeThumb(file, function(err, src) {
-            if (err) {
-              console.log(err);
-            } else {
-              file.src = src;
-              appendFile(file);
-            }
-          });
-    } else {
+      uploader.makeThumb(file, function(err, src) {
+        if (err) {
+          file.src = BLANK;
+        } else {
+          file.src = src;
+        }
+
+        appendFile(file);
+      });
+    }
+    // 来自已有
+    else {
       appendFile(file);
     }
   });
+
+  (function() {
+    // 已有的图片
+    var files = host.get('files');
+    var n = files.length;
+
+    if (n) {
+      var i;
+
+      for (i = 0; i < n; i++) {
+        host.trigger('fileQueued', {
+          id: files[i].id,
+          src: files[i].value
+        });
+      }
+    }
+  })();
 
   // 通知就绪
   this.ready();

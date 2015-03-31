@@ -10,7 +10,7 @@ var $ = require('jquery');
 var WebUploader = require('../vendor/webuploader');
 
 if (!WebUploader.Uploader.support()) {
-  alert('WebUploader 不支持您的浏览器！如果您使用的是IE浏览器，请尝试升级 Flash 播放器。');
+  alert('WebUploader 不支持您的浏览器！如果您使用的是 IE 浏览器，请尝试升级 Flash 播放器。');
   throw new Error('WebUploader does not support the browser you are using.');
 }
 
@@ -105,7 +105,6 @@ module.exports = function() {
       // 必须 jpeg 否则 flash 环境下无法显示 png
       type: 'jpeg'
     },
-
     swf: host.get('swf'),
     server: host.get('server'),
     // runtimeOrder: 'flash, html5',
@@ -115,6 +114,7 @@ module.exports = function() {
     fileNumLimit: host.get('maxcount')
   }, host.get('core')))
     .on('all', function() {
+      // 所有事件同步到 host
       return host.trigger.apply(host, arguments);
     });
 

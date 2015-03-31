@@ -13,15 +13,6 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
 
-    server: {
-      develop: {
-        options: {
-          config: false,
-          release: false
-        }
-      }
-    },
-
     jshint: {
       files: ['index.js', 'src/**/*.js'],
       options: {
@@ -40,6 +31,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask('publish', ['test', 'exec:spm-publish']);
 
-  grunt.registerTask('default', ['server']);
+  grunt.registerTask('default', ['publish']);
 
 };

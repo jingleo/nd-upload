@@ -27,18 +27,35 @@ module.exports = function() {
 
   var maxcount = host.get('maxcount');
 
+  // 文件最大数限制
   if (maxcount) {
-    host.on('fileQueued fileDequeued', function() {
-      var count = uploader.getFiles().length;
+    (function() {
+      var files = host.get('files');
 
-      pickElem.css((count < maxcount) ? {
-        top: 'auto'
-      } : {
-        top: '-99999px'
+      function togglePick() {
+        pickElem.css({
+          top: (files.length < maxcount) ? 'auto' : '-99999px'
+        });
+
+        host.set('value', files.length ? 'fake' : '');
+      }
+
+      host.on('fileQueued', function(file) {
+        if (file.type) {
+          files.push({
+            id: file.id
+          });
+        }
+
+        togglePick();
       });
 
-      host.get('trigger').value = count ? 'fake' : '';
-    });
+      host.on('fileDequeued', function(file) {
+        host.removeFile(file.id);
+
+        togglePick();
+      });
+    })();
   }
 
   // 通知就绪

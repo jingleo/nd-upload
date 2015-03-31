@@ -54,6 +54,52 @@ module.exports = Widget.extend({
         return val;
       }
     },
+    files: {
+      value: null, // required
+      getter: function (val, key) {
+        if (!$.isArray(val)) {
+          val = this.get('value');
+
+          if (val) {
+            if (val.charAt(0) === '[' && val.slice(-1) === ']') {
+              val = JSON.parse(val);
+            } else {
+              val = [val];
+            }
+
+            $.each(val, function(i, item) {
+              val[i] = {
+                // 用于移除判断
+                id: item,
+                // 用于提交数据
+                value: item
+              };
+            });
+          }
+
+          this.attrs[key].value = val || [];
+        }
+
+        return val;
+      }
+    },
+    value: {
+      value: null, // required
+      getter: function (val/*, key*/) {
+        return val || this.get('trigger').value;
+      },
+      setter: function (val/*, key*/) {
+        if ($.isArray(val)) {
+          val = JSON.stringify(val);
+        }
+
+        this.get('trigger').value = val || '';
+
+        this._blurTrigger();
+
+        return val;
+      }
+    },
     accept: {
       value: null, // required
       getter: function (val, key) {
@@ -124,7 +170,6 @@ module.exports = Widget.extend({
         return val;
       }
     },
-    // accept: null,
     plugins: require('./src/plugins'),
     parentNode: {
       value: null, // required
@@ -137,16 +182,26 @@ module.exports = Widget.extend({
     },
     // 模板
     classPrefix: 'ui-upload',
-    template: require('./src/upload.handlebars')
+    template: require('./src/upload.handlebars'),
+    processFile: function(file, res) {
+      if (res && res.url) {
+        var files = this.get('files');
+        // 将指定返回值赋与对应项
+        for (var i = 0; i < files.length; i++) {
+          if (files[i].id === file.id) {
+            files[i].value = res.url;
+            break;
+          }
+        }
+      }
+    }
   },
 
   setup: function() {
     this.initPlugins();
 
-    var values = this.values = [];
-
     this.on('uploadSuccess', function(file, res) {
-      res && res.url && values.push(res.url);
+      this.get('processFile').call(this, file, res);
     });
   },
 
@@ -161,28 +216,74 @@ module.exports = Widget.extend({
     });
   },
 
+  // 根据 ID 移除 attrs.files 中对应的文件
+  // 不是移除队列文件
+  removeFile: function(id) {
+    var files = this.get('files');
+    var i;
+    var n = files.length;
+
+    for (i = 0; i < n; i++) {
+      if (files[i].id === id) {
+        files.splice(i, 1);
+        break;
+      }
+    }
+  },
+
+  // 返回不为空的 file value
+  _getFilesValue: function() {
+    var files = this.get('files');
+    var i;
+    var n = files.length;
+    var value = [];
+
+    for (i = 0; i < n; i++) {
+      if (files[i].value) {
+        value.push(files[i].value);
+      }
+    }
+
+    return value;
+  },
+
+  _blurTrigger: function() {
+    $(this.get('trigger')).trigger('blur');
+  },
+
   execute: function(callback) {
     var that = this;
 
+    that.trigger('valid');
+
     this.once('uploadFinished', function() {
       var hasErr = false;
+      var files = that.get('files');
+      var n = files.length;
 
-      if (that.values.length) {
+      if (n) {
         if (that.get('multiple')) {
-          that.get('trigger').value = JSON.stringify(that.values);
+          that.set('value', that._getFilesValue());
         } else {
-          that.get('trigger').value = that.values.slice(-1);
+
+          // 如果非多选，仅取最后一个
+          that.set('value', files[n - 1].value);
         }
       } else {
-        if (that.get('required')) {
-          hasErr = true;
-        }
+        that.set('value', '');
+      }
+
+      if (that.get('required') && !that.get('value')) {
+        hasErr = true;
+        $(this.get('trigger')).trigger('blur');
       }
 
       callback && callback(hasErr);
     });
 
+    // 执行上传
     this.getPlugin('uploadCore').exports.upload();
   }
 
 });
+
