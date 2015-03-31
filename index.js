@@ -198,21 +198,8 @@ module.exports = Widget.extend({
   },
 
   setup: function() {
-    this.initPlugins();
-
     this.on('uploadSuccess', function(file, res) {
       this.get('processFile').call(this, file, res);
-    });
-  },
-
-  initPlugins: function() {
-    var that = this;
-
-    // 插件
-    $.each(this.get('plugins'), function(i, item) {
-      if (!item.disabled) {
-        that.addPlugin(item.name, item.plugin, item.callbacks);
-      }
     });
   },
 
