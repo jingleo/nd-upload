@@ -75,9 +75,11 @@ module.exports = Widget.extend({
                 value: item
               };
             });
+          } else {
+            val = [];
           }
 
-          this.attrs[key].value = val || [];
+          this.attrs[key].value = val;
         }
 
         return val;

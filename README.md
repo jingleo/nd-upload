@@ -13,11 +13,6 @@ $ spm install nd-upload --save
 ## 使用
 
 ```js
-var Uploader = require('nd-upload');
-
-使用时，需手动配置vendor下的Uploader.swf
-new Uploader({
-	swf: ''//swf地址
-})
+var Upload = require('nd-upload');
 // use nd-upload
 ```
