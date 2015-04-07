@@ -1,20 +1,20 @@
 'use strict';
 
-module.exports = {
-  uploadCore: {
+module.exports = [
+  {
     name: 'uploadCore',
-    plugin: require('./plugins/upload-core')
+    starter: require('./plugins/upload-core')
   },
-  uploadPick: {
+  {
     name: 'uploadPick',
-    plugin: require('./plugins/upload-pick')
+    starter: require('./plugins/upload-pick')
   },
-  uploadQueue: {
+  {
     name: 'uploadQueue',
-    plugin: require('./plugins/upload-queue')
+    starter: require('./plugins/upload-queue')
   },
-  uploadMessage: {
+  {
     name: 'uploadMessage',
-    plugin: require('./plugins/upload-message')
+    starter: require('./plugins/upload-message')
   }
-};
+];
