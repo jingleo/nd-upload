@@ -9,12 +9,12 @@ var $ = require('jquery');
 
 var WebUploader = require('../vendor/webuploader');
 
-if (!WebUploader.Uploader.support()) {
-  alert('WebUploader 不支持您的浏览器！如果您使用的是 IE 浏览器，请尝试升级 Flash 播放器。');
-  throw new Error('WebUploader does not support the browser you are using.');
-}
-
 module.exports = function() {
+  if (!WebUploader.Uploader.support()) {
+    alert('您无法进行下一步操作，因为文件上传功能需要更高版本（或支持 Flash 播放器）的浏览器。');
+    throw new Error('WebUploader does not support the browser you are using.');
+  }
+
   var plugin = this,
     host = plugin.host;
 
