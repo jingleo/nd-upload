@@ -302,6 +302,12 @@ Upload.pluginEntry = {
     host.after('render', plugin.execute);
     // host.after('addField', plugin.execute);
 
+    host.before('destroy', function() {
+      Object.keys(_widgets).forEach(function(key) {
+        _widgets[key].destroy();
+      });
+    });
+
     plugin.getWidget = function(name) {
       return _widgets[name];
     };
