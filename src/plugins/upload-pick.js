@@ -33,9 +33,13 @@ module.exports = function() {
       var files = host.get('files');
 
       function togglePick() {
-        pickElem.css({
-          top: (files.length < maxcount) ? 'auto' : '-99999px'
-        });
+        // pickElem.css({
+        //   top: (files.length < maxcount) ? 'auto' : '-99999px'
+        // });
+
+        // 将导致 Flash 场景下的 picker 失效
+        // 现在仅支持 H5 模式
+        pickElem.toggle(files.length < maxcount);
 
         host.set('value', files.length ? 'fake' : '');
       }

@@ -2,5 +2,13 @@
   <div class="{{classPrefix}}-buttons">
     <span class="{{classPrefix}}-remove" data-role="remove-file"></span>
   </div>
-  {{#if src}}<img src="{{src}}" width="{{width}}" height="{{height}}" alt="{{name}}" />{{/if}}
+  {{#if src}}
+    <img class="{{classPrefix}}-img" src="{{src}}" width="{{width}}" height="{{height}}" alt="{{name}}">
+  {{else}}
+    <div class="{{classPrefix}}-box">
+      <div class="{{classPrefix}}-icon fileicon-{{iconType type name}}"></div>
+      <div class="{{classPrefix}}-name">{{name}}</div>
+      <div class="{{classPrefix}}-size">{{sizePrettify size}}</div>
+    </div>
+  {{/if}}
 </div>

@@ -34,7 +34,7 @@ module.exports = function() {
       model: file
     }).before('destroy', function() {
       // model === WUFile === file === this.get('model')
-      if (/^image\//.test(file.type)) {
+      if (file.type) {
         uploader.removeFile(file, true);
       } else {
         host.trigger('fileDequeued', file);
@@ -45,18 +45,25 @@ module.exports = function() {
   // 缩略图
   host.on('fileQueued', function(file) {
     // 来自上传
-    if (/^image\//.test(file.type)) {
-      uploader.makeThumb(file, function(err, src) {
-        if (err) {
-          file.src = BLANK;
-        } else {
-          file.src = src;
-        }
+    if (file.type) {
+      // 图片
+      if (/^image\//.test(file.type)) {
+        uploader.makeThumb(file, function(err, src) {
+          if (err) {
+            file.src = BLANK;
+          } else {
+            file.src = src;
+          }
 
+          appendFile(file);
+        });
+      }
+      // 其它
+      else {
         appendFile(file);
-      });
+      }
     }
-    // 来自已有
+    // 来自已有（场景：如编辑）
     else {
       appendFile(file);
     }
@@ -67,7 +74,7 @@ module.exports = function() {
   // });
 
   (function() {
-    // 已有的图片
+    // 已有的图片（场景：如编辑）
     var files = host.get('files');
     var n = files.length;
 
