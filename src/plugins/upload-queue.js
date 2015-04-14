@@ -62,6 +62,10 @@ module.exports = function() {
     }
   });
 
+  // host.before('destroy', function() {
+  //   uploadQueue.destroy();
+  // });
+
   (function() {
     // 已有的图片
     var files = host.get('files');

@@ -1,7 +1,7 @@
 /**
- * Description: Gruntfile.js
- * Author: LinNing <565153851@qq.com>
- * Date: 2015-01-16 16:43:04
+ * Description: 基于 WebUploader 的上传组件
+ * Author: crossjs <liwenfu@crossjs.com>
+ * Date: 2015-01-16 14:52:39
  */
 
 'use strict';

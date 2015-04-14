@@ -87,6 +87,10 @@ module.exports = function() {
     }
   });
 
+  // host.before('destroy', function() {
+  //   // TODO
+  // });
+
   // 通知就绪
   this.ready();
 };

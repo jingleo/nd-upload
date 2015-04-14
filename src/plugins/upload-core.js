@@ -119,6 +119,10 @@ module.exports = function() {
       return host.trigger.apply(host, arguments);
     });
 
+  host.before('destroy', function() {
+    plugin.exports && plugin.exports.destroy();
+  });
+
   // 通知就绪
   this.ready();
 };
