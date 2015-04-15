@@ -287,7 +287,7 @@ Upload.pluginEntry = {
     function addWidget(name, instance) {
       _widgets[name] = instance;
 
-      plugin.trigger('export', instance);
+      plugin.trigger('export', instance, name);
     }
 
     plugin.execute = function() {
