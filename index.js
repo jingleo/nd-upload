@@ -35,7 +35,7 @@ var Upload = Widget.extend({
       getter: function (val, key) {
         if (!val) {
           val = this.get('session');
-          val = val ? val.baseUri : [];
+          val = val ? (val.baseUri || []) : [];
           this.attrs[key].value = val;
         }
 
@@ -45,9 +45,9 @@ var Upload = Widget.extend({
     session: {
       value: null, // required
       getter: function (val, key) {
-        if (!val) {
+        if (val === null) {
           val = this.get('trigger').getAttribute('session');
-          val = val ? JSON.parse(val) : {};
+          val = val ? JSON.parse(val) : false;
           this.attrs[key].value = val;
         }
 
@@ -147,8 +147,7 @@ var Upload = Widget.extend({
       value: null, // required
       getter: function (val, key) {
         if (typeof val !== 'boolean') {
-          val = !!this.get('trigger').required;
-          this.attrs[key].value = val;
+          this.attrs[key].value = !!this.get('trigger').required;
         }
 
         return val;
@@ -158,8 +157,7 @@ var Upload = Widget.extend({
       value: null, // required
       getter: function (val, key) {
         if (typeof val !== 'boolean') {
-          val = !!this.get('trigger').multiple;
-          this.attrs[key].value = val;
+          this.attrs[key].value = !!this.get('trigger').multiple;
         }
 
         return val;
@@ -169,8 +167,7 @@ var Upload = Widget.extend({
       value: null, // required
       getter: function (val, key) {
         if (typeof val !== 'number') {
-          val = +this.get('trigger').getAttribute('maxbytes');
-          this.attrs[key].value = val;
+          this.attrs[key].value = +this.get('trigger').getAttribute('maxbytes');
         }
 
         return val;
@@ -276,11 +273,10 @@ var Upload = Widget.extend({
 
   execute: function(callback) {
     var that = this;
-    var baseUri = this.get('baseUri');
     var session = this.get('session');
 
-    if (baseUri.length) {
-      this.GET(null, session.data)
+    if (session) {
+      this.POST(session.data)
         .done(function(data) {
           that.getPlugin('uploadCore').exports
               .option('server',
