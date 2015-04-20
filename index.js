@@ -8,12 +8,13 @@
 
 var $ = require('jquery'),
   Widget = require('nd-widget'),
-  Template = require('nd-template');
+  Template = require('nd-template'),
+  RESTful = require('nd-restful');
 
 var Upload = Widget.extend({
 
   // 使用 handlebars
-  Implements: [Template],
+  Implements: [Template, RESTful],
 
   attrs: {
     core: {},
@@ -22,8 +23,31 @@ var Upload = Widget.extend({
       value: null, // required
       getter: function (val, key) {
         if (typeof val !== 'string') {
-          val = '' + this.get('trigger').getAttribute('swf');
+          val = this.get('trigger').getAttribute('swf');
+          this.attrs[key].value = val || '';
+        }
 
+        return val;
+      }
+    },
+    baseUri: {
+      value: null, // required
+      getter: function (val, key) {
+        if (!val) {
+          val = this.get('session');
+          val = val ? val.baseUri : [];
+          this.attrs[key].value = val;
+        }
+
+        return val;
+      }
+    },
+    session: {
+      value: null, // required
+      getter: function (val, key) {
+        if (!val) {
+          val = this.get('trigger').getAttribute('session');
+          val = val ? JSON.parse(val) : {};
           this.attrs[key].value = val;
         }
 
@@ -34,9 +58,8 @@ var Upload = Widget.extend({
       value: null, // required
       getter: function (val, key) {
         if (typeof val !== 'string') {
-          val = '' + this.get('trigger').getAttribute('server');
-
-          this.attrs[key].value = val;
+          val = this.get('trigger').getAttribute('server');
+          this.attrs[key].value = val || '';
         }
 
         return val;
@@ -46,9 +69,8 @@ var Upload = Widget.extend({
       value: null, // required
       getter: function (val, key) {
         if (typeof val !== 'string') {
-          val = '' + this.get('trigger').title;
-
-          this.attrs[key].value = val;
+          val = this.get('trigger').title;
+          this.attrs[key].value = val || '';
         }
 
         return val;
@@ -106,7 +128,7 @@ var Upload = Widget.extend({
       value: null, // required
       getter: function (val, key) {
         if (!val) {
-          var _val = '' + this.get('trigger').accept;
+          var _val = this.get('trigger').accept;
 
           val = {
             title: this.get('title'),
@@ -166,6 +188,18 @@ var Upload = Widget.extend({
             }
           }
 
+          this.attrs[key].value = val;
+        }
+
+        return val;
+      }
+    },
+    formData: {
+      value: null, // required
+      getter: function (val, key) {
+        if (!val) {
+          val = this.get('trigger').getAttribute('formdata');
+          val = val ? JSON.parse(val) : {};
           this.attrs[key].value = val;
         }
 
@@ -242,6 +276,28 @@ var Upload = Widget.extend({
 
   execute: function(callback) {
     var that = this;
+    var baseUri = this.get('baseUri');
+    var session = this.get('session');
+
+    if (baseUri.length) {
+      this.GET(null, session.data)
+        .done(function(data) {
+          that.getPlugin('uploadCore').exports
+              .option('server',
+                  that.get('server').replace('{session}', data.session));
+          that._execute(callback);
+        })
+        .fail(function() {
+          // error
+          callback(true);
+        });
+    } else {
+      this._execute(callback);
+    }
+  },
+
+  _execute: function(callback) {
+    var that = this;
 
     that.trigger('valid');
 
@@ -294,7 +350,8 @@ Upload.pluginEntry = {
       host.$('[type="file"]').each(function(i, field) {
         field.type = 'hidden';
         addWidget(field.name, new Upload({
-          trigger: field
+          trigger: field,
+          proxy: host.get('proxy')
         }).render());
       });
     };
