@@ -4089,10 +4089,10 @@
 
                 // 配置默认的上传字段。
                 data = $.extend( data, {
-                    id: file.id,
+                    // id: file.id,
                     name: file.name,
-                    type: file.type,
-                    lastModifiedDate: file.lastModifiedDate,
+                    // type: file.type,
+                    // lastModifiedDate: file.lastModifiedDate,
                     size: file.size
                 });
 

@@ -107,6 +107,7 @@ module.exports = function() {
     },
     swf: host.get('swf'),
     server: host.get('server'),
+    formData: host.get('formData'),
     // method: 'GET',
     // runtimeOrder: 'flash, html5',
     accept: host.get('accept'),

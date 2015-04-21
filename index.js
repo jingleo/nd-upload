@@ -6,15 +6,14 @@
 
 'use strict';
 
-var $ = require('jquery'),
-  Widget = require('nd-widget'),
-  Template = require('nd-template'),
-  RESTful = require('nd-restful');
+var $ = require('jquery');
+var Widget = require('nd-widget');
+var Template = require('nd-template');
 
 var Upload = Widget.extend({
 
   // 使用 handlebars
-  Implements: [Template, RESTful],
+  Implements: [Template],
 
   attrs: {
     core: {},
@@ -274,13 +273,22 @@ var Upload = Widget.extend({
   execute: function(callback) {
     var that = this;
     var session = this.get('session');
+    var proxy;
 
     if (session) {
-      this.POST(session.data)
+      proxy = this.get('proxy');
+
+      if (!proxy) {
+        console.error('缺少 proxy，无法获取 session ！');
+      }
+
+      proxy.POST(session.data)
         .done(function(data) {
-          that.getPlugin('uploadCore').exports
-              .option('server',
-                  that.get('server').replace('{session}', data.session));
+          var core = that.getPlugin('uploadCore').exports;
+          core.option('server', that.get('server').replace('{session}', data.session));
+          if (data.path) {
+            core.option('formData').path = data.path;
+          }
           that._execute(callback);
         })
         .fail(function() {
