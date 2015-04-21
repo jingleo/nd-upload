@@ -1,6 +1,6 @@
 # nd-upload
 
-[![spm version](http://spmjs.io/badge/nd-upload)](http://spmjs.io/package/nd-upload)
+[![spm version](http://spm.crossjs.com/badge/nd-upload)](http://spm.crossjs.com/package/nd-upload)
 
 > 基于 WebUploader 的上传组件
 
