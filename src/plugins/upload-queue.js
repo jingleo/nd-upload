@@ -74,20 +74,28 @@ module.exports = function() {
   // });
 
   (function() {
+    var remote = host.get('server').remote;
+    var remoteUrl = [remote.host, remote.version, remote.download].join('/');
+
+    function addFile(file, session) {
+      host.trigger('fileQueued', {
+        id: file.id,
+        src: remoteUrl.replace('{session}', session)
+                      .replace('{dentryId}', file.value)
+      });
+    }
+
     // 已有的图片（场景：如编辑）
-    var files = host.get('files');
-    var n = files.length;
-
-    if (n) {
-      var i;
-
-      for (i = 0; i < n; i++) {
-        host.trigger('fileQueued', {
-          id: files[i].id,
-          src: files[i].value
+    host.get('files').forEach(function(file) {
+      // file.value = '24f7d1f5-83d7-4a5a-bc0e-6a3b9dc9faa1';
+      if (remote.scope) {
+        addFile(file, '');
+      } else {
+        host.session(function(data) {
+          addFile(file, data.session);
         });
       }
-    }
+    });
   })();
 
   // 通知就绪

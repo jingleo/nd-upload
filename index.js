@@ -18,55 +18,50 @@ var Upload = Widget.extend({
   attrs: {
     core: {},
     pick: {},
-    swf: {
-      value: null, // required
-      getter: function (val, key) {
-        if (typeof val !== 'string') {
-          val = this.get('trigger').getAttribute('swf');
-          this.attrs[key].value = val || '';
-        }
+    // swf: {
+    //   value: null, // required
+    //   getter: function(val, key) {
+    //     if (typeof val !== 'string') {
+    //       val = this.get('trigger').getAttribute('swf');
+    //       this.attrs[key].value = val || '';
+    //     }
 
-        return val;
-      }
-    },
-    baseUri: {
-      value: null, // required
-      getter: function (val, key) {
-        if (!val) {
-          val = this.get('session');
-          val = val ? (val.baseUri || []) : [];
-          this.attrs[key].value = val;
-        }
+    //     return val;
+    //   }
+    // },
+    // baseUri: {
+    //   value: null, // required
+    //   getter: function(val, key) {
+    //     if (!val) {
+    //       val = this.get('session');
+    //       val = val ? (val.baseUri || []) : [];
+    //       this.attrs[key].value = val;
+    //     }
 
-        return val;
-      }
-    },
-    session: {
-      value: null, // required
-      getter: function (val, key) {
-        if (val === null) {
-          val = this.get('trigger').getAttribute('session');
-          val = val ? JSON.parse(val) : false;
-          this.attrs[key].value = val;
-        }
-
-        return val;
-      }
-    },
+    //     return val;
+    //   }
+    // },
     server: {
-      value: null, // required
-      getter: function (val, key) {
-        if (typeof val !== 'string') {
-          val = this.get('trigger').getAttribute('server');
-          this.attrs[key].value = val || '';
-        }
-
-        return val;
+      // locale is required
+      // locale: {
+      //   host: '',
+      //   version: '',
+      //   session: '',
+      //   // 存放路径
+      //   path: ''
+      // },
+      remote: {
+        // host is required
+        // host: '',
+        version: 'v0.1',
+        upload: 'upload?session={session}',
+        download: 'download?session={session}&dentryId={dentryId}',
+        scope: 1
       }
     },
     title: {
       value: null, // required
-      getter: function (val, key) {
+      getter: function(val, key) {
         if (typeof val !== 'string') {
           val = this.get('trigger').title;
           this.attrs[key].value = val || '';
@@ -77,8 +72,8 @@ var Upload = Widget.extend({
     },
     files: {
       value: null, // required
-      getter: function (val, key) {
-        if (!$.isArray(val)) {
+      getter: function(val, key) {
+        if (!Array.isArray(val)) {
           val = this.get('value');
 
           if (val) {
@@ -108,10 +103,10 @@ var Upload = Widget.extend({
     },
     value: {
       value: null, // required
-      getter: function (val/*, key*/) {
+      getter: function(val /*, key*/ ) {
         return val || this.get('trigger').value;
       },
-      setter: function (val/*, key*/) {
+      setter: function(val /*, key*/ ) {
         if ($.isArray(val)) {
           val = JSON.stringify(val);
         }
@@ -125,7 +120,7 @@ var Upload = Widget.extend({
     },
     accept: {
       value: null, // required
-      getter: function (val, key) {
+      getter: function(val, key) {
         if (!val) {
           var _val = this.get('trigger').accept;
 
@@ -144,7 +139,7 @@ var Upload = Widget.extend({
     },
     required: {
       value: null, // required
-      getter: function (val, key) {
+      getter: function(val, key) {
         if (typeof val !== 'boolean') {
           this.attrs[key].value = !!this.get('trigger').required;
         }
@@ -154,7 +149,7 @@ var Upload = Widget.extend({
     },
     multiple: {
       value: null, // required
-      getter: function (val, key) {
+      getter: function(val, key) {
         if (typeof val !== 'boolean') {
           this.attrs[key].value = !!this.get('trigger').multiple;
         }
@@ -164,7 +159,7 @@ var Upload = Widget.extend({
     },
     maxbytes: {
       value: null, // required
-      getter: function (val, key) {
+      getter: function(val, key) {
         if (typeof val !== 'number') {
           this.attrs[key].value = +this.get('trigger').getAttribute('maxbytes');
         }
@@ -174,7 +169,7 @@ var Upload = Widget.extend({
     },
     maxcount: {
       value: null, // required
-      getter: function (val, key) {
+      getter: function(val, key) {
         if (typeof val !== 'number') {
           val = +this.get('trigger').getAttribute('maxcount');
 
@@ -192,7 +187,7 @@ var Upload = Widget.extend({
     },
     formData: {
       value: null, // required
-      getter: function (val, key) {
+      getter: function(val, key) {
         if (!val) {
           val = this.get('trigger').getAttribute('formdata');
           val = val ? JSON.parse(val) : {};
@@ -205,7 +200,7 @@ var Upload = Widget.extend({
     plugins: require('./src/plugins'),
     parentNode: {
       value: null, // required
-      getter: function (val) {
+      getter: function(val) {
         return val ? $(val) : $(this.get('trigger'));
       }
     },
@@ -216,12 +211,12 @@ var Upload = Widget.extend({
     classPrefix: 'ui-upload',
     template: require('./src/upload.handlebars'),
     processFile: function(file, res) {
-      if (res && res.url) {
+      if (res && res['dentry_id']) {
         var files = this.get('files');
         // 将指定返回值赋与对应项
         for (var i = 0; i < files.length; i++) {
           if (files[i].id === file.id) {
-            files[i].value = res.url;
+            files[i].value = res['dentry_id'];
             break;
           }
         }
@@ -232,6 +227,14 @@ var Upload = Widget.extend({
   setup: function() {
     this.on('uploadSuccess', function(file, res) {
       this.get('processFile').call(this, file, res);
+    });
+
+    this.set('server', (function(val) {
+      return val ? JSON.parse(val) : {};
+    })(this.get('trigger').getAttribute('server')));
+
+    this.set('formData', {
+      scope: this.get('server').remote.scope
     });
   },
 
@@ -270,68 +273,74 @@ var Upload = Widget.extend({
     $(this.get('trigger')).trigger('blur');
   },
 
-  execute: function(callback) {
-    var that = this;
-    var session = this.get('session');
-    var proxy;
+  session: function(callback) {
+    var proxy = this.get('proxy');
 
-    if (session) {
-      proxy = this.get('proxy');
-
-      if (!proxy) {
-        console.error('缺少 proxy，无法获取 session ！');
-      }
-
-      proxy.POST(session.data)
-        .done(function(data) {
-          var core = that.getPlugin('uploadCore').exports;
-          core.option('server', that.get('server').replace('{session}', data.session));
-          if (data.path) {
-            core.option('formData').path = data.path;
-          }
-          that._execute(callback);
-        })
-        .fail(function() {
-          // error
-          callback(true);
-        });
-    } else {
-      this._execute(callback);
+    if (!proxy) {
+      console.error('缺少 proxy，无法获取 session ！');
+      return callback({});
     }
+
+    var locale = this.get('server').locale;
+
+    proxy.POST({
+        baseUri: [locale.host, locale.version, locale.session],
+        data: {
+          path: locale.path
+        }
+      })
+      .done(function(data) {
+        callback(data);
+      })
+      .fail(function() {
+        // error
+        callback({});
+      });
   },
 
-  _execute: function(callback) {
+  // 暂时不做无 session 的情况
+  execute: function(callback) {
     var that = this;
 
-    that.trigger('valid');
+    this.session(function(data) {
+      that.trigger('session', data);
 
-    this.once('uploadFinished', function() {
-      var hasErr = false;
-      var files = that.get('files');
-      var n = files.length;
+      that.once('uploadFinished', function() {
+        var hasErr = false;
+        var files = that.get('files');
+        var count = files.length;
 
-      if (n) {
-        if (that.get('multiple')) {
-          that.set('value', that._getFilesValue());
+        if (count) {
+          if (that.get('multiple')) {
+            that.set('value', that._getFilesValue());
+          } else {
+
+            // 如果非多选，仅取最后一个
+            that.set('value', files[count - 1].value);
+          }
         } else {
-
-          // 如果非多选，仅取最后一个
-          that.set('value', files[n - 1].value);
+          that.set('value', '');
         }
-      } else {
-        that.set('value', '');
-      }
 
-      if (that.get('required') && !that.get('value')) {
-        hasErr = true;
-        $(this.get('trigger')).trigger('blur');
-      }
+        if (that.get('required') && !that.get('value')) {
+          hasErr = true;
+          $(this.get('trigger')).trigger('blur');
+        }
 
-      callback && callback(hasErr);
+        callback && callback(hasErr);
+      });
+
+      that.upload();
     });
+  },
 
-    // 执行上传
-    this.getPlugin('uploadCore').exports.upload();
+  upload: function() {
+    // WHY HERE IS A TRIGGER?
+    // COMMENTS OUT FIRST
+    // this.trigger('valid');
+
+    // for plugin
+    this.trigger('upload');
   }
 
 });
