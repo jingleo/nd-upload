@@ -224,7 +224,9 @@ var Upload = Widget.extend({
     }
   },
 
-  setup: function() {
+  initAttrs: function(config) {
+    Upload.superclass.initAttrs.call(this, config);
+
     this.on('uploadSuccess', function(file, res) {
       this.get('processFile').call(this, file, res);
     });
