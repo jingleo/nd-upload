@@ -285,7 +285,7 @@ var Upload = Widget.extend({
 
     var locale = this.get('server').locale;
 
-    proxy.POST({
+    proxy[locale.method || 'POST']({
         baseUri: [locale.host, locale.version, locale.session],
         data: {
           path: locale.path
@@ -303,6 +303,10 @@ var Upload = Widget.extend({
   // 暂时不做无 session 的情况
   execute: function(callback) {
     var that = this;
+
+    if (this.get('trigger').getAttribute('data-skip') === 'true') {
+      return callback();
+    }
 
     this.session(function(data) {
       that.trigger('session', data);
