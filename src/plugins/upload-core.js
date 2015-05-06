@@ -97,6 +97,8 @@ module.exports = function() {
   //    Q_EMPTY_FILE
   // }
 
+  var attrServerRemote = host.get('server').remote;
+
   var core = plugin.exports = WebUploader.create($.extend(true, {
       thumb: {
         // TODO: 内容服务，仅支持 80,120,160,240,320,480,640,960
@@ -108,7 +110,7 @@ module.exports = function() {
       },
       swf: host.get('swf'),
       // server: host.get('server'),
-      formData: host.get('formData'),
+      formData: attrServerRemote.formData,
       // method: 'GET',
       // runtimeOrder: 'flash, html5',
       accept: host.get('accept'),
@@ -121,19 +123,16 @@ module.exports = function() {
       return host.trigger.apply(host, arguments);
     });
 
-  var _server = (function(remote) {
-    return [remote.host, remote.version, remote.upload].join('/');
-  })(host.get('server').remote);
-
   // 更新 options
   host.on('session', function(data) {
-   core.option('server', _server.replace('{session}', data.session || ''));
-   core.option('formData').path = data.path || '';
+    core.option('server', [attrServerRemote.host, attrServerRemote.version, attrServerRemote.upload]
+                          .join('/').replace('{session}', data.session || ''));
+    core.option('formData').path = data.path || '';
   });
 
   // 上传
   host.on('upload', function() {
-   core.upload();
+    core.upload();
   });
 
   host.before('destroy', function() {

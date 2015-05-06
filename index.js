@@ -18,17 +18,17 @@ var Upload = Widget.extend({
   attrs: {
     core: {},
     pick: {},
-    // swf: {
-    //   value: null, // required
-    //   getter: function(val, key) {
-    //     if (typeof val !== 'string') {
-    //       val = this.get('trigger').getAttribute('swf');
-    //       this.attrs[key].value = val || '';
-    //     }
+    swf: {
+      value: null, // required
+      getter: function(val, key) {
+        if (typeof val !== 'string') {
+          val = this.get('trigger').getAttribute('swf');
+          this.attrs[key].value = val || '';
+        }
 
-    //     return val;
-    //   }
-    // },
+        return val;
+      }
+    },
     // baseUri: {
     //   value: null, // required
     //   getter: function(val, key) {
@@ -46,9 +46,11 @@ var Upload = Widget.extend({
       // locale: {
       //   host: '',
       //   version: '',
-      //   session: '',
-      //   // 存放路径
-      //   path: ''
+      //   session: '',,
+      //   formData: {
+      //     // 存放路径
+      //     path: ''
+      //   }
       // },
       remote: {
         // host is required
@@ -56,7 +58,9 @@ var Upload = Widget.extend({
         version: 'v0.1',
         upload: 'upload?session={session}',
         download: 'download?session={session}&dentryId={dentryId}',
-        scope: 1
+        formData: {
+          scope: 1
+        }
       }
     },
     title: {
@@ -185,18 +189,6 @@ var Upload = Widget.extend({
         return val;
       }
     },
-    formData: {
-      value: null, // required
-      getter: function(val, key) {
-        if (!val) {
-          val = this.get('trigger').getAttribute('formdata');
-          val = val ? JSON.parse(val) : {};
-          this.attrs[key].value = val;
-        }
-
-        return val;
-      }
-    },
     plugins: require('./src/plugins'),
     parentNode: {
       value: null, // required
@@ -207,8 +199,8 @@ var Upload = Widget.extend({
     insertInto: function(element, parentNode) {
       element.insertAfter(parentNode);
     },
-    // 模板
     classPrefix: 'ui-upload',
+    // 模板
     template: require('./src/upload.handlebars'),
     processFile: function(file, res) {
       if (res && res['dentry_id']) {
@@ -227,17 +219,17 @@ var Upload = Widget.extend({
   initAttrs: function(config) {
     Upload.superclass.initAttrs.call(this, config);
 
+    this.set('server', (function(val) {
+      return val ? JSON.parse(val) : {};
+    })(this.get('trigger').getAttribute('server')));
+  },
+
+  setup: function() {
     this.on('uploadSuccess', function(file, res) {
       this.get('processFile').call(this, file, res);
     });
 
-    this.set('server', (function(val) {
-      return val ? JSON.parse(val) : {};
-    })(this.get('trigger').getAttribute('server')));
-
-    this.set('formData', {
-      scope: this.get('server').remote.scope
-    });
+    Upload.superclass.setup.call(this);
   },
 
   // 根据 ID 移除 attrs.files 中对应的文件
@@ -283,13 +275,11 @@ var Upload = Widget.extend({
       return callback({});
     }
 
-    var locale = this.get('server').locale;
+    var attrServerLocale = this.get('server').locale;
 
-    proxy[locale.method || 'POST']({
-        baseUri: [locale.host, locale.version, locale.session],
-        data: {
-          path: locale.path
-        }
+    proxy[attrServerLocale.method || 'POST']({
+        baseUri: [attrServerLocale.host, attrServerLocale.version, attrServerLocale.session],
+        data: attrServerLocale.formData
       })
       .done(function(data) {
         callback(data);
