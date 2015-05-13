@@ -33,15 +33,8 @@ module.exports = function() {
       var files = host.get('files');
 
       function togglePick() {
-        // pickElem.css({
-        //   top: (files.length < maxcount) ? 'auto' : '-99999px'
-        // });
-
-        // 将导致 Flash 场景下的 picker 失效，仅支持 H5 模式
-        // pickElem.toggle(files.length < maxcount);
-
-        // 转用 绝对定位与 clip
-        pickElem.toggleClass('webuploader-element-invisible', files.length >= maxcount);
+        pickElem.toggleClass(
+          'webuploader-element-invisible', files.length >= maxcount);
 
         host.set('value', files.length ? 'fake' : '');
       }

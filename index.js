@@ -10,6 +10,8 @@ var $ = require('jquery');
 var Widget = require('nd-widget');
 var Template = require('nd-template');
 
+var DENTRY_ID_PATTERN = /^[0-9a-f]{8}(\-[0-9a-f]{4}){3}\-[0-9a-f]{12}$/;
+
 var Upload = Widget.extend({
 
   // 使用 handlebars
@@ -29,18 +31,7 @@ var Upload = Widget.extend({
         return val;
       }
     },
-    // baseUri: {
-    //   value: null, // required
-    //   getter: function(val, key) {
-    //     if (!val) {
-    //       val = this.get('session');
-    //       val = val ? (val.baseUri || []) : [];
-    //       this.attrs[key].value = val;
-    //     }
-
-    //     return val;
-    //   }
-    // },
+    thumbSizes: [80, 120, 160, 240, 320, 480, 640, 960],
     server: {
       // locale is required
       // locale: {
@@ -111,7 +102,7 @@ var Upload = Widget.extend({
         return val || this.get('trigger').value;
       },
       setter: function(val /*, key*/ ) {
-        if ($.isArray(val)) {
+        if (Array.isArray(val)) {
           val = JSON.stringify(val);
         }
 
@@ -145,7 +136,7 @@ var Upload = Widget.extend({
       value: null, // required
       getter: function(val, key) {
         if (typeof val !== 'boolean') {
-          this.attrs[key].value = !!this.get('trigger').required;
+          this.attrs[key].value = val = !!this.get('trigger').required;
         }
 
         return val;
@@ -155,7 +146,7 @@ var Upload = Widget.extend({
       value: null, // required
       getter: function(val, key) {
         if (typeof val !== 'boolean') {
-          this.attrs[key].value = !!this.get('trigger').multiple;
+          this.attrs[key].value = val = !!this.get('trigger').multiple;
         }
 
         return val;
@@ -165,7 +156,7 @@ var Upload = Widget.extend({
       value: null, // required
       getter: function(val, key) {
         if (typeof val !== 'number') {
-          this.attrs[key].value = +this.get('trigger').getAttribute('maxbytes');
+          this.attrs[key].value = val = +this.get('trigger').getAttribute('maxbytes');
         }
 
         return val;
@@ -193,7 +184,7 @@ var Upload = Widget.extend({
     parentNode: {
       value: null, // required
       getter: function(val) {
-        return val ? $(val) : $(this.get('trigger'));
+        return val || this.get('trigger');
       }
     },
     insertInto: function(element, parentNode) {
@@ -212,6 +203,16 @@ var Upload = Widget.extend({
             break;
           }
         }
+      }
+    },
+    realpath: {
+      value: null,
+      getter: function(val, key) {
+        if (typeof val !== 'boolean') {
+          this.attrs[key].value = val = !!this.get('trigger').getAttribute('realpath');
+        }
+
+        return val;
       }
     }
   },
@@ -250,17 +251,14 @@ var Upload = Widget.extend({
   // 返回不为空的 file value
   _getFilesValue: function() {
     var files = this.get('files');
-    var i;
-    var n = files.length;
     var value = [];
+    var realpath = this.get('realpath');
 
-    for (i = 0; i < n; i++) {
-      if (files[i].value) {
-        value.push(files[i].value);
-      }
-    }
+    files.length && files.forEach(function(file) {
+      file.value && value.push(realpath ? this.getRemoteURL(file).src : file.value);
+    }, this);
 
-    return value;
+    return this.get('multiple') ? value : (value.pop() || '');
   },
 
   _blurTrigger: function() {
@@ -278,7 +276,11 @@ var Upload = Widget.extend({
     var attrServerLocale = this.get('server').locale;
 
     proxy[attrServerLocale.method || 'POST']({
-        baseUri: [attrServerLocale.host, attrServerLocale.version, attrServerLocale.session],
+        baseUri: [
+          attrServerLocale.host,
+          attrServerLocale.version,
+          attrServerLocale.session
+        ],
         data: attrServerLocale.formData
       })
       .done(function(data) {
@@ -288,6 +290,43 @@ var Upload = Widget.extend({
         // error
         callback({});
       });
+  },
+
+  // GET DOWNLOAD URL
+  getRemoteURL: function(file, callback, size) {
+    if (!DENTRY_ID_PATTERN.test(file.value)) {
+      file.src = file.value;
+      callback && callback(file);
+      return file;
+    }
+
+    var remote = this.get('server').remote;
+
+    var remoteUrl = [
+      remote.host,
+      remote.version,
+      remote.download
+    ].join('/');
+
+    var isPublic = remote.formData && remote.formData.scope;
+
+    file.src = remoteUrl.replace('{dentryId}', file.value);
+
+    if (size && this.get('thumbSizes').indexOf(size) !== -1) {
+      file.src += '&size=' + size;
+    }
+
+    if (isPublic) {
+      file.src = file.src.replace('session={session}&', '');
+      callback && callback(file);
+    } else {
+      this.session(function(data) {
+        file.src = file.src.replace('{session}', data.session);
+        callback && callback(file);
+      });
+    }
+
+    return file;
   },
 
   // 暂时不做无 session 的情况
@@ -303,20 +342,8 @@ var Upload = Widget.extend({
 
       that.once('uploadFinished', function() {
         var hasErr = false;
-        var files = that.get('files');
-        var count = files.length;
 
-        if (count) {
-          if (that.get('multiple')) {
-            that.set('value', that._getFilesValue());
-          } else {
-
-            // 如果非多选，仅取最后一个
-            that.set('value', files[count - 1].value);
-          }
-        } else {
-          that.set('value', '');
-        }
+        that.set('value', this._getFilesValue());
 
         if (that.get('required') && !that.get('value')) {
           hasErr = true;
@@ -331,10 +358,6 @@ var Upload = Widget.extend({
   },
 
   upload: function() {
-    // WHY HERE IS A TRIGGER?
-    // COMMENTS OUT FIRST
-    // this.trigger('valid');
-
     // for plugin
     this.trigger('upload');
   }
@@ -365,8 +388,21 @@ Upload.pluginEntry = {
       });
     };
 
+    typeof host.use === 'function' &&
+      plugin.on('export', function(instance) {
+        host.use(function(next) {
+          instance.execute(function(err) {
+            if (!err) {
+              next();
+            }
+          });
+        });
+      });
+
     host.after('render', plugin.execute);
-    // host.after('addField', plugin.execute);
+
+    typeof host.addField === 'function' &&
+      host.after('addField', plugin.execute);
 
     host.before('destroy', function() {
       Object.keys(_widgets).forEach(function(key) {

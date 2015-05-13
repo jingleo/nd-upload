@@ -80,7 +80,7 @@ module.exports = function() {
     showMessage(template || '未知错误');
   });
 
-  host.on('valid beforeFileQueued', function() {
+  host.on('upload beforeFileQueued', function() {
     if (hasErr) {
       hasErr = false;
       hideMessage('');

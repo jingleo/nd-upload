@@ -14,5 +14,5 @@ $ spm install nd-upload --save
 
 ```js
 var Upload = require('nd-upload');
-// use nd-upload
+// use Upload
 ```

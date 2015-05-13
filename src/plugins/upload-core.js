@@ -102,8 +102,8 @@ module.exports = function() {
   var core = plugin.exports = WebUploader.create($.extend(true, {
       thumb: {
         // TODO: 内容服务，仅支持 80,120,160,240,320,480,640,960
-        width: 100,
-        height: 100,
+        width: 120,
+        height: 120,
         quality: 100,
         // 必须 jpeg 否则 flash 环境下无法显示 png
         type: 'jpeg'
@@ -125,8 +125,12 @@ module.exports = function() {
 
   // 更新 options
   host.on('session', function(data) {
-    core.option('server', [attrServerRemote.host, attrServerRemote.version, attrServerRemote.upload]
-                          .join('/').replace('{session}', data.session || ''));
+    core.option('server', [
+        attrServerRemote.host,
+        attrServerRemote.version,
+        attrServerRemote.upload
+      ].join('/').replace('{session}', data.session || ''));
+
     core.option('formData').path = data.path || '';
   });
 

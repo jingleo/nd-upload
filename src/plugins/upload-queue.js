@@ -73,30 +73,15 @@ module.exports = function() {
   //   uploadQueue.destroy();
   // });
 
-  (function() {
-    var remote = host.get('server').remote;
-    var remoteUrl = [remote.host, remote.version, remote.download].join('/');
-
-    function addFile(file, session) {
+  // 已有的图片（场景：如编辑）
+  host.get('files').forEach(function(file) {
+    host.getRemoteURL(file, function(file) {
       host.trigger('fileQueued', {
         id: file.id,
-        src: remoteUrl.replace('{session}', session)
-                      .replace('{dentryId}', file.value)
+        src: file.src
       });
-    }
-
-    // 已有的图片（场景：如编辑）
-    host.get('files').forEach(function(file) {
-      // file.value = '24f7d1f5-83d7-4a5a-bc0e-6a3b9dc9faa1';
-      if (remote.scope) {
-        addFile(file, '');
-      } else {
-        host.session(function(data) {
-          addFile(file, data.session);
-        });
-      }
-    });
-  })();
+    }, 120);
+  });
 
   // 通知就绪
   this.ready();
