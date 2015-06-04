@@ -1,6 +1,6 @@
 /**
- * @module: nd-upload
- * @author: crossjs <liwenfu@crossjs.com> - 2015-03-13 16:12:15
+ * @module Upload
+ * @author crossjs <liwenfu@crossjs.com>
  */
 
 'use strict';
@@ -18,7 +18,7 @@ module.exports = function() {
   uploader
     .addButton($.extend(true, {
       id: host.element[0],
-      innerHTML: '选择',
+      innerHTML: host.get('trigger').placeholder || '选择',
       button: pickElem,
       multiple: host.get('multiple'),
       // 移除默认 name="file"
