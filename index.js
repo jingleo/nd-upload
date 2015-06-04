@@ -337,8 +337,10 @@ var Upload = Widget.extend({
   // 暂时不做无 session 的情况
   execute: function(callback) {
     var that = this;
+    var skip = +(this.get('trigger').getAttribute('data-skip') || '');
 
-    if (this.get('trigger').getAttribute('data-skip') === 'true') {
+    // SKIP_SUBMIT === 1
+    if (!(skip & 1)) {
       return callback();
     }
 
