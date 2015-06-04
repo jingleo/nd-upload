@@ -1,6 +1,6 @@
 /**
- * @module: nd-upload
- * @author: crossjs <liwenfu@crossjs.com> - 2015-03-13 16:12:15
+ * @module Upload
+ * @author crossjs <liwenfu@crossjs.com>
  */
 
 'use strict';
@@ -17,85 +17,6 @@ module.exports = function() {
 
   var plugin = this,
     host = plugin.host;
-
-  // OPTIONS: {
-  // swf: './vendor/uploader.swf',
-  // server: '',
-  // dnd: undefined
-  // disableGlobalDnd: false
-  // paste: undefined
-  // pick:  {
-  //   id: id/class/dom
-  //   innerHTML: 指定按钮文字
-  //   multiple: true/false
-  // },
-  // pick: undefined
-  // accept:  {
-  //   title: 文字描述
-  //   extensions: 允许的文件后缀，不带点，多个用逗号分割
-  //   mimeTypes: 多个用逗号分割
-  // },
-  // accept: null,
-  // thumb: {
-  //   width: 110,
-  //   height: 110,
-  //   quality: 70,
-  //   allowMagnify: true,
-  //   crop: true,
-  //   type: 'image/jpeg'
-  // },
-  // compress: {
-  //   width: 1600,
-  //   height: 1600,
-  //   quality: 90,
-  //   allowMagnify: false,
-  //   crop: false,
-  //   preserveHeaders: true,
-  //   noCompressIfLarger: false,
-  //   compressSize: 0
-  // },
-  // auto: false,
-  // runtimeOrder: 'html5, flash',
-  // prepareNextFile: false
-  // chunked: false
-  // chunkSize: 5242880
-  // chunkRetry: 2
-  // threads: 3
-  // formData: {}
-  // fileVal: 'file'
-  // method: 'POST'
-  // sendAsBinary: false
-  // fileNumLimit: undefined,
-  // fileSizeLimit: undefined,
-  // fileSingleSizeLimit: undefined,
-  // duplicate: undefined
-  // disableWidgets: []
-  // }
-
-  // EVENTS: {
-  // dndAccept
-  // beforeFileQueued
-  // fileQueued
-  // filesQueued
-  // fileDequeued
-  // reset
-  // startUpload
-  // stopUpload
-  // uploadFinished
-  // uploadStart
-  // uploadBeforeSend
-  // uploadAccept
-  // uploadProgress
-  // uploadError
-  // uploadSuccess
-  // uploadComplete
-  // error
-  //    Q_EXCEED_NUM_LIMIT
-  //    Q_EXCEED_SIZE_LIMIT
-  //    Q_EXCEED_SIZE_LIMIT
-  //    Q_TYPE_DENIED
-  //    Q_EMPTY_FILE
-  // }
 
   var attrServerRemote = host.get('server').remote;
 

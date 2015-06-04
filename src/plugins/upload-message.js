@@ -1,6 +1,6 @@
 /**
- * @module: nd-upload
- * @author: crossjs <liwenfu@crossjs.com> - 2015-03-13 16:12:15
+ * @module Upload
+ * @author crossjs <liwenfu@crossjs.com>
  */
 
 'use strict';
@@ -87,9 +87,9 @@ module.exports = function() {
     }
   });
 
-  // host.before('destroy', function() {
-  //   // TODO
-  // });
+  host.before('destroy', function() {
+    container.off().remove();
+  });
 
   // 通知就绪
   this.ready();

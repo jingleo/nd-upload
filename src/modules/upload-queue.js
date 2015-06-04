@@ -1,6 +1,6 @@
 /**
- * @module: nd-upload
- * @author: crossjs <liwenfu@crossjs.com> - 2015-03-13 16:12:15
+ * @module Upload
+ * @author crossjs <liwenfu@crossjs.com>
  */
 
 'use strict';

@@ -1,6 +1,6 @@
 /**
- * @module: nd-upload
- * @author: crossjs <liwenfu@crossjs.com> - 2015-03-13 16:12:15
+ * @module Upload
+ * @author crossjs <liwenfu@crossjs.com>
  */
 
 'use strict';
@@ -69,9 +69,9 @@ module.exports = function() {
     }
   });
 
-  // host.before('destroy', function() {
-  //   uploadQueue.destroy();
-  // });
+  host.before('destroy', function() {
+    uploadQueue.destroy();
+  });
 
   // 已有的图片（场景：如编辑）
   host.get('files').forEach(function(file) {

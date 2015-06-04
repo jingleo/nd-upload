@@ -1,7 +1,6 @@
 /**
- * Description: 基于 WebUploader 的上传组件
- * Author: crossjs <liwenfu@crossjs.com>
- * Date: 2015-01-16 14:52:39
+ * @module Upload
+ * @author crossjs <liwenfu@crossjs.com>
  */
 
 'use strict';
@@ -402,18 +401,29 @@ Upload.pluginEntry = {
     typeof host.use === 'function' &&
       plugin.on('export', function(instance) {
         host.use(function(next) {
+          // destroyed
+          if (!instance.element) {
+            return next();
+          }
           instance.execute(function(err) {
             if (!err) {
               next();
             }
           });
-        });
+        }, 'Upload');
       });
 
     host.after('render', plugin.execute);
 
     typeof host.addField === 'function' &&
       host.after('addField', plugin.execute);
+
+    typeof host.removeField === 'function' &&
+      host.before('removeField', function(name) {
+        if (name in _widgets) {
+          _widgets[name].destroy();
+        }
+      });
 
     host.before('destroy', function() {
       Object.keys(_widgets).forEach(function(key) {
