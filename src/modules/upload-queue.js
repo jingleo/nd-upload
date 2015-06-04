@@ -5,8 +5,8 @@
 
 'use strict';
 
-var Widget = require('nd-widget'),
-  Template = require('nd-template');
+var Widget = require('nd-widget');
+var Template = require('nd-template');
 
 module.exports = Widget.extend({
 

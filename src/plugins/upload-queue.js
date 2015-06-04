@@ -8,6 +8,8 @@
 var UploadQueue = require('../modules/upload-queue');
 var UploadFile = require('../modules/upload-file');
 
+var MIME_TYPES = require('../vendor/mimetypes');
+
 var BLANK = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
 
 module.exports = function() {
@@ -24,6 +26,64 @@ module.exports = function() {
   }).render();
 
   var optThumb = uploader.option('thumb');
+
+  function prettySize(size) {
+    if (!size) {
+      return '';
+    }
+
+    var ENUM = [' B', ' KB', ' MB', ' GB', ' TB'];
+
+    var i = 0, kilo = 1024;
+
+    while (size > kilo) {
+      size /= kilo;
+      i++;
+    }
+
+    return size.toFixed(2).replace(/\.00|0$/g, '') + ENUM[i];
+  }
+
+  function iconType(type, ext) {
+    if (type) {
+      if (type in MIME_TYPES) {
+        return MIME_TYPES[type];
+      }
+    }
+
+    return ext || 'unknown';
+  }
+
+  function makeupFile(file, callback) {
+    if (/^image\//.test(file.type)) {
+      file.isImage = true;
+      return callback();
+    }
+
+    var image = new Image();
+    image.src = file.src;
+    image.onerror = function() {
+      file.isImage = false;
+
+      file.name || (file.name = file.src);
+
+      if (!file.ext) {
+        file.ext = file.name.match(/\.(.+)?$/);
+        if (file.ext) {
+          file.ext = file.ext[1];
+        }
+      }
+
+      file.iconType = iconType(file.type, file.ext);
+      file.prettySize = prettySize(file.size);
+
+      callback();
+    };
+    image.onload = function() {
+      file.isImage = true;
+      callback();
+    };
+  }
 
   /* helpers */
   function appendFile(file) {
@@ -44,16 +104,11 @@ module.exports = function() {
 
   // 缩略图
   host.on('fileQueued', function(file) {
-    // 来自上传
-    if (file.type) {
+    makeupFile(file, function() {
       // 图片
-      if (/^image\//.test(file.type)) {
+      if (file.isImage) {
         uploader.makeThumb(file, function(err, src) {
-          if (err) {
-            file.src = BLANK;
-          } else {
-            file.src = src;
-          }
+          file.src = err ? BLANK : src;
 
           appendFile(file);
         });
@@ -62,11 +117,7 @@ module.exports = function() {
       else {
         appendFile(file);
       }
-    }
-    // 来自已有（场景：如编辑）
-    else {
-      appendFile(file);
-    }
+    });
   });
 
   host.before('destroy', function() {
