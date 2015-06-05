@@ -340,7 +340,7 @@ var Upload = Widget.extend({
     var skip = +(this.get('trigger').getAttribute('data-skip') || '');
 
     // SKIP_SUBMIT === 1
-    if (!(skip & 1)) {
+    if (skip & 1) {
       return callback();
     }
 

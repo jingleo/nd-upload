@@ -106,7 +106,7 @@ module.exports = function() {
   host.on('fileQueued', function(file) {
     makeupFile(file, function() {
       // 图片
-      if (file.isImage) {
+      if (file.type && file.isImage) {
         uploader.makeThumb(file, function(err, src) {
           file.src = err ? BLANK : src;
 
