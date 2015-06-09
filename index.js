@@ -231,7 +231,7 @@ var Upload = Widget.extend({
     });
 
     this.on('uploadError', function(file/*, res*/) {
-      Alert.show(file.name + '上传失败，检查是否网络问题');
+      Alert.show(file.name + '上传失败，请检查网络连接');
     });
 
     Upload.superclass.setup.call(this);
