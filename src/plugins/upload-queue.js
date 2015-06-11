@@ -45,44 +45,15 @@ module.exports = function() {
   }
 
   function iconType(type, ext) {
-    if (type) {
-      if (type in MIME_TYPES) {
-        return MIME_TYPES[type];
-      }
+    if (type && (type in MIME_TYPES)) {
+      return MIME_TYPES[type];
     }
 
-    return ext || 'unknown';
-  }
-
-  function makeupFile(file, callback) {
-    if (/^image\//.test(file.type)) {
-      file.isImage = true;
-      return callback();
+    if (ext && (ext in MIME_TYPES)) {
+      return MIME_TYPES[ext];
     }
 
-    var image = new Image();
-    image.src = file.src;
-    image.onerror = function() {
-      file.isImage = false;
-
-      file.name || (file.name = file.src);
-
-      if (!file.ext) {
-        file.ext = file.name.match(/\.(.+)?$/);
-        if (file.ext) {
-          file.ext = file.ext[1];
-        }
-      }
-
-      file.iconType = iconType(file.type, file.ext);
-      file.prettySize = prettySize(file.size);
-
-      callback();
-    };
-    image.onload = function() {
-      file.isImage = true;
-      callback();
-    };
+    return 'unknown';
   }
 
   /* helpers */
@@ -94,7 +65,7 @@ module.exports = function() {
       model: file
     }).before('destroy', function() {
       // model === WUFile === file === this.get('model')
-      if (file.type) {
+      if (file.source) {
         uploader.removeFile(file, true);
       } else {
         host.trigger('fileDequeued', file);
@@ -104,20 +75,34 @@ module.exports = function() {
 
   // 缩略图
   host.on('fileQueued', function(file) {
-    makeupFile(file, function() {
-      // 图片
-      if (file.type && file.isImage) {
+    if (file.isImage) {
+      if (file.source) {
         uploader.makeThumb(file, function(err, src) {
           file.src = err ? BLANK : src;
 
           appendFile(file);
         });
-      }
-      // 其它
-      else {
+      } else {
         appendFile(file);
       }
-    });
+    }
+    // 其它
+    else {
+      file.name || (file.name = file.src);
+
+      if (!file.ext) {
+        file.ext = file.name.match(/\.(.+)?$/);
+
+        if (file.ext && file.ext < 6) {
+          file.ext = file.ext[1];
+        }
+      }
+
+      file.iconType = iconType(file.type, file.ext);
+      file.prettySize = prettySize(file.size);
+
+      appendFile(file);
+    }
   });
 
   host.before('destroy', function() {
@@ -126,12 +111,24 @@ module.exports = function() {
 
   // 已有的图片（场景：如编辑）
   host.get('files').forEach(function(file) {
-    host.getRemoteURL(file, function(file) {
-      host.trigger('fileQueued', {
-        id: file.id,
-        src: file.src
-      });
-    }, 120);
+    host.getDetail(file, function(file) {
+      if ((file.type && /^image\//.test(file.type))) {
+        host.getDownload(file, {
+          size: 120
+        }, function(file) {
+          file.isImage = true;
+          host.trigger('fileQueued', file);
+        });
+      } else {
+        host.getDownload(file, {
+          attachment: true,
+          name: file.name
+        }, function(file) {
+          file.canDownload = true;
+          host.trigger('fileQueued', file);
+        });
+      }
+    });
   });
 
   // 通知就绪

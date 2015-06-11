@@ -31,7 +31,7 @@ var Upload = Widget.extend({
         return val;
       }
     },
-    thumbSizes: [80, 120, 160, 240, 320, 480, 640, 960],
+    // thumbSizes: [80, 120, 160, 240, 320, 480, 640, 960],
     server: {
       // locale is required
       // locale: {
@@ -48,6 +48,7 @@ var Upload = Widget.extend({
         // host: '',
         version: 'v0.1',
         upload: 'upload?session={session}',
+        detail: 'dentries/{dentryId}',
         download: 'download?session={session}&dentryId={dentryId}',
         formData: {
           scope: 1
@@ -259,7 +260,7 @@ var Upload = Widget.extend({
     var realpath = this.get('realpath');
 
     files.length && files.forEach(function(file) {
-      file.value && value.push(realpath ? this.getRemoteURL(file).src : file.value);
+      file.value && value.push(realpath ? this.getDownload(file).src : file.value);
     }, this);
 
     return this.get('multiple') ? value : (value.pop() || '');
@@ -269,7 +270,7 @@ var Upload = Widget.extend({
     $(this.get('trigger')).trigger('blur');
   },
 
-  session: function(callback) {
+  getSession: function(callback) {
     var proxy = this.get('proxy');
 
     if (!proxy) {
@@ -297,8 +298,57 @@ var Upload = Widget.extend({
       });
   },
 
+  // GET FILE INFO
+  getDetail: function(file, callback) {
+    var that = this;
+
+    this.getSession(function(data) {
+      if (!data) {
+        return callback(file);
+      }
+
+      var proxy = that.get('proxy');
+
+      var attrServerRemote = that.get('server').remote;
+
+      proxy[attrServerRemote.method || 'GET']({
+          baseUri: [
+            attrServerRemote.host,
+            attrServerRemote.version,
+            attrServerRemote.detail
+          ],
+          replacement: {
+            dentryId: file.value
+          },
+          data: {
+            session: data.session
+          }
+        })
+        .done(function(data) {
+          if (data.inode) {
+            file.type = data.inode.mime;
+            file.size = data.inode.size;
+          }
+          if (data.name) {
+            file.name = data.name;
+          }
+          callback(file);
+        })
+        .fail(function(error) {
+          // error
+          callback(file);
+          Alert.show(error);
+        });
+    });
+  },
+
   // GET DOWNLOAD URL
-  getRemoteURL: function(file, callback, size) {
+  getDownload: function(file, data, callback) {
+    if (!callback) {
+      callback = data;
+      data = null;
+    }
+
     if (!DENTRY_ID_PATTERN.test(file.value)) {
       file.src = file.value;
       callback && callback(file);
@@ -317,15 +367,17 @@ var Upload = Widget.extend({
 
     file.src = remoteUrl.replace('{dentryId}', file.value);
 
-    if (size && this.get('thumbSizes').indexOf(size) !== -1) {
-      file.src += '&size=' + size;
+    if (data) {
+      Object.keys(data).forEach(function(key) {
+        file.src += '&' + key + '=' + data[key];
+      });
     }
 
     if (isPublic) {
       file.src = file.src.replace('session={session}&', '');
       callback && callback(file);
     } else {
-      this.session(function(data) {
+      this.getSession(function(data) {
         file.src = file.src.replace('{session}', data.session);
         callback && callback(file);
       });
@@ -344,7 +396,7 @@ var Upload = Widget.extend({
       return callback();
     }
 
-    this.session(function(data) {
+    this.getSession(function(data) {
       that.trigger('session', data);
 
       if (!data) {

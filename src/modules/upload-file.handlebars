@@ -1,6 +1,6 @@
 <div class="{{classPrefix}}" title="{{name}}">
   <div class="{{classPrefix}}-buttons">
-    <span class="{{classPrefix}}-remove" data-role="remove-file"></span>
+    <span title="移除" class="iconfont iconfont-remove {{classPrefix}}-remove" data-role="remove-file"></span>{{#if canDownload}}<a title="下载" class="iconfont iconfont-download {{classPrefix}}-download" href="{{src}}"></a>{{/if}}
   </div>
   {{#if isImage}}
     <img class="{{classPrefix}}-img" src="{{src}}" width="{{width}}" height="{{height}}" alt="{{name}}">

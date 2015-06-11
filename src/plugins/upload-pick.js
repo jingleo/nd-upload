@@ -40,7 +40,8 @@ module.exports = function() {
       }
 
       host.on('fileQueued', function(file) {
-        if (file.type) {
+        // 来自文件系统选取
+        if (file.source) {
           files.push({
             id: file.id
           });
