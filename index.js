@@ -10,6 +10,8 @@ var Widget = require('nd-widget');
 var Template = require('nd-template');
 var Alert = require('nd-alert');
 
+var Proxy = require('./src/proxy');
+
 var DENTRY_ID_PATTERN = /^[0-9a-f]{8}(\-[0-9a-f]{4}){3}\-[0-9a-f]{12}$/;
 
 var Upload = Widget.extend({
@@ -226,6 +228,10 @@ var Upload = Widget.extend({
     })(this.get('trigger').getAttribute('server')));
   },
 
+  initProps: function() {
+    this.proxy = new Proxy();
+  },
+
   setup: function() {
     this.on('uploadSuccess', function(file, res) {
       this.get('processFile').call(this, file, res);
@@ -271,16 +277,9 @@ var Upload = Widget.extend({
   },
 
   getSession: function(callback) {
-    var proxy = this.get('proxy');
-
-    if (!proxy) {
-      console.error('缺少 proxy，无法获取 session ！');
-      return callback(false);
-    }
-
     var attrServerLocale = this.get('server').locale;
 
-    proxy[attrServerLocale.method || 'POST']({
+    this.proxy[attrServerLocale.method || 'POST']({
         baseUri: [
           attrServerLocale.host,
           attrServerLocale.version,
@@ -307,11 +306,9 @@ var Upload = Widget.extend({
         return callback(file);
       }
 
-      var proxy = that.get('proxy');
-
       var attrServerRemote = that.get('server').remote;
 
-      proxy[attrServerRemote.method || 'GET']({
+      that.proxy[attrServerRemote.method || 'GET']({
           baseUri: [
             attrServerRemote.host,
             attrServerRemote.version,
@@ -446,8 +443,7 @@ Upload.pluginEntry = {
       host.$('[type="file"]').each(function(i, field) {
         field.type = 'hidden';
         addWidget(field.name, new Upload($.extend(true, {
-          trigger: field,
-          proxy: host.get('proxy')
+          trigger: field
         }, plugin.getOptions('config'))).render());
       });
     };
