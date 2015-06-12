@@ -75,6 +75,8 @@ module.exports = function() {
 
   // 缩略图
   host.on('fileQueued', function(file) {
+    file.isImage || (file.isImage = file.type && /^image\//.test(file.type));
+
     if (file.isImage) {
       if (file.source) {
         uploader.makeThumb(file, function(err, src) {
