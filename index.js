@@ -8,7 +8,7 @@
 var $ = require('jquery');
 var Widget = require('nd-widget');
 var Template = require('nd-template');
-var Alert = require('nd-alert');
+var debug = require('nd-debug');
 
 var Proxy = require('./src/proxy');
 
@@ -238,7 +238,7 @@ var Upload = Widget.extend({
     });
 
     this.on('uploadError', function(file/*, res*/) {
-      Alert.show(file.name + '上传失败，请检查网络连接');
+      debug.error('文件 ' + file.name + ' 上传失败，请检查网络连接');
     });
 
     Upload.superclass.setup.call(this);
@@ -293,7 +293,7 @@ var Upload = Widget.extend({
       .fail(function(error) {
         // error
         callback(false);
-        Alert.show(error);
+        debug.error(error);
       });
   },
 
@@ -334,7 +334,7 @@ var Upload = Widget.extend({
         .fail(function(error) {
           // error
           callback(file);
-          Alert.show(error);
+          debug.error(error);
         });
     });
   },
@@ -414,7 +414,6 @@ var Upload = Widget.extend({
       });
 
       that.upload();
-
     });
   },
 
