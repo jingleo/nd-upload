@@ -10,8 +10,6 @@ var Widget = require('nd-widget');
 var Template = require('nd-template');
 var debug = require('nd-debug');
 
-var Proxy = require('./src/proxy');
-
 var DENTRY_ID_PATTERN = /^[0-9a-f]{8}(\-[0-9a-f]{4}){3}\-[0-9a-f]{12}$/;
 
 var Upload = Widget.extend({
@@ -229,7 +227,7 @@ var Upload = Widget.extend({
   },
 
   initProps: function() {
-    this.proxy = new Proxy();
+    this.proxy = this.get('proxy');
   },
 
   setup: function() {
@@ -442,7 +440,8 @@ Upload.pluginEntry = {
       host.$('[type="file"]').each(function(i, field) {
         field.type = 'hidden';
         addWidget(field.name, new Upload($.extend(true, {
-          trigger: field
+          trigger: field,
+          proxy: host.get('proxy')
         }, plugin.getOptions('config'))).render());
       });
     };
