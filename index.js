@@ -100,14 +100,14 @@ var Upload = Widget.extend({
     value: {
       value: null, // required
       getter: function(val /*, key*/ ) {
-        return val || this.get('trigger').value;
+        return val || this.get('trigger').getAttribute('value');
       },
       setter: function(val /*, key*/ ) {
         if (Array.isArray(val)) {
           val = JSON.stringify(val);
         }
 
-        this.get('trigger').value = val || '';
+        this.get('trigger').setAttribute('value', val || '');
 
         this._blurTrigger();
 
