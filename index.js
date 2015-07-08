@@ -10,8 +10,6 @@ var Widget = require('nd-widget');
 var Template = require('nd-template');
 var debug = require('nd-debug');
 
-var DENTRY_ID_PATTERN = /^[0-9a-f]{8}(\-[0-9a-f]{4}){3}\-[0-9a-f]{12}$/;
-
 var Upload = Widget.extend({
 
   // 使用 handlebars
@@ -29,30 +27,6 @@ var Upload = Widget.extend({
         }
 
         return val;
-      }
-    },
-    // thumbSizes: [80, 120, 160, 240, 320, 480, 640, 960],
-    server: {
-      // locale is required
-      // locale: {
-      //   host: '',
-      //   version: '',
-      //   session: '',,
-      //   formData: {
-      //     // 存放路径
-      //     path: ''
-      //   }
-      // },
-      remote: {
-        // host is required
-        // host: '',
-        version: 'v0.1',
-        upload: 'upload?session={session}',
-        detail: 'dentries/{dentryId}',
-        download: 'download?session={session}&dentryId={dentryId}',
-        formData: {
-          scope: 1
-        }
       }
     },
     title: {
@@ -79,8 +53,8 @@ var Upload = Widget.extend({
               val = [val];
             }
 
-            $.each(val, function(i, item) {
-              val[i] = {
+            val = val.map(function(item) {
+              return {
                 // 用于移除判断
                 id: item,
                 // 用于提交数据
@@ -215,6 +189,9 @@ var Upload = Widget.extend({
 
         return val;
       }
+    },
+    session: function(callback) {
+      callback(false);
     }
   },
 
@@ -226,9 +203,8 @@ var Upload = Widget.extend({
     })(this.get('trigger').getAttribute('server')));
   },
 
-  initProps: function() {
-    this.proxy = this.get('proxy');
-  },
+  // initProps: function() {
+  // },
 
   setup: function() {
     this.on('uploadSuccess', function(file, res) {
@@ -264,7 +240,7 @@ var Upload = Widget.extend({
     var realpath = this.get('realpath');
 
     files.length && files.forEach(function(file) {
-      file.value && value.push(realpath ? this.getDownload(file).src : file.value);
+      file.value && value.push(realpath ? this.get('download')(file).src : file.value);
     }, this);
 
     return this.get('multiple') ? value : (value.pop() || '');
@@ -274,113 +250,6 @@ var Upload = Widget.extend({
     $(this.get('trigger')).trigger('blur');
   },
 
-  getSession: function(callback) {
-    var attrServerLocale = this.get('server').locale;
-
-    this.proxy[attrServerLocale.method || 'POST']({
-        baseUri: [
-          attrServerLocale.host,
-          attrServerLocale.version,
-          attrServerLocale.session
-        ],
-        data: attrServerLocale.formData
-      })
-      .done(function(data) {
-        callback(data);
-      })
-      .fail(function(error) {
-        // error
-        callback(false);
-        debug.error(error);
-      });
-  },
-
-  // GET FILE INFO
-  getDetail: function(file, callback) {
-    var that = this;
-
-    this.getSession(function(data) {
-      if (!data) {
-        return callback(file);
-      }
-
-      var attrServerRemote = that.get('server').remote;
-
-      that.proxy[attrServerRemote.method || 'GET']({
-          baseUri: [
-            attrServerRemote.host,
-            attrServerRemote.version,
-            attrServerRemote.detail
-          ],
-          replacement: {
-            dentryId: file.value
-          },
-          data: {
-            session: data.session
-          }
-        })
-        .done(function(data) {
-          if (data.inode) {
-            file.type = data.inode.mime;
-            file.size = data.inode.size;
-          }
-          if (data.name) {
-            file.name = data.name;
-          }
-          callback(file);
-        })
-        .fail(function(error) {
-          // error
-          callback(file);
-          debug.error(error);
-        });
-    });
-  },
-
-  // GET DOWNLOAD URL
-  getDownload: function(file, data, callback) {
-    if (!callback) {
-      callback = data;
-      data = null;
-    }
-
-    if (!DENTRY_ID_PATTERN.test(file.value)) {
-      file.src = file.value;
-      callback && callback(file);
-      return file;
-    }
-
-    var remote = this.get('server').remote;
-
-    var remoteUrl = [
-      remote.host,
-      remote.version,
-      remote.download
-    ].join('/');
-
-    var isPublic = remote.formData && remote.formData.scope;
-
-    file.src = remoteUrl.replace('{dentryId}', file.value);
-
-    if (data) {
-      Object.keys(data).forEach(function(key) {
-        file.src += '&' + key + '=' + data[key];
-      });
-    }
-
-    if (isPublic) {
-      file.src = file.src.replace('session={session}&', '');
-      callback && callback(file);
-    } else {
-      this.getSession(function(data) {
-        file.src = file.src.replace('{session}', data.session);
-        callback && callback(file);
-      });
-    }
-
-    return file;
-  },
-
   // 暂时不做无 session 的情况
   execute: function(callback) {
     var that = this;
@@ -388,36 +257,39 @@ var Upload = Widget.extend({
 
     // SKIP_SUBMIT === 1
     if (skip & 1) {
-      return callback();
+      return callback && callback();
     }
 
-    this.getSession(function(data) {
-      that.trigger('session', data);
+    function complete() {
+      var hasErr = false;
 
-      if (!data) {
-        return;
+      that.set('value', that._getFilesValue());
+
+      if (that.get('required') && !that.get('value')) {
+        hasErr = true;
+        $(that.get('trigger')).trigger('blur');
       }
 
-      that.once('uploadFinished', function() {
-        var hasErr = false;
+      callback && callback(hasErr);
+    }
 
-        that.set('value', this._getFilesValue());
+    // 如果队列文件为空
+    if (!this.get('files').some(function(file) { return !!file.source; })) {
+      return complete();
+    }
 
-        if (that.get('required') && !that.get('value')) {
-          hasErr = true;
-          $(this.get('trigger')).trigger('blur');
-        }
+    this.once('uploadFinished', complete);
 
-        callback && callback(hasErr);
-      });
-
-      that.upload();
-    });
+    this.upload();
   },
 
   upload: function() {
-    // for plugin
-    this.trigger('upload');
+    var that = this;
+
+    this.get('upload')(function(data) {
+      // for plugin
+      that.trigger('upload', data);
+    });
   }
 
 });
@@ -440,8 +312,7 @@ Upload.pluginEntry = {
       host.$('[type="file"]').each(function(i, field) {
         field.type = 'hidden';
         addWidget(field.name, new Upload($.extend(true, {
-          trigger: field,
-          proxy: host.get('proxy')
+          trigger: field
         }, plugin.getOptions('config'))).render());
       });
     };

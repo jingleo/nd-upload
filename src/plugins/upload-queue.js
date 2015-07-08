@@ -5,6 +5,8 @@
 
 'use strict';
 
+var debug = require('nd-debug');
+
 var UploadQueue = require('../modules/upload-queue');
 var UploadFile = require('../modules/upload-file');
 
@@ -113,16 +115,16 @@ module.exports = function() {
 
   // 已有的图片（场景：如编辑）
   host.get('files').forEach(function(file) {
-    host.getDetail(file, function(file) {
+    host.get('detail')(file, function(file) {
       if ((file.type && /^image\//.test(file.type))) {
-        host.getDownload(file, {
+        host.get('download')(file, {
           size: 120
         }, function(file) {
           file.isImage = true;
           host.trigger('fileQueued', file);
         });
       } else {
-        host.getDownload(file, {
+        host.get('download')(file, {
           attachment: true,
           name: file.name
         }, function(file) {

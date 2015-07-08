@@ -43,6 +43,7 @@ module.exports = function() {
         // 来自文件系统选取
         if (file.source) {
           files.push({
+            source: file.source,
             id: file.id
           });
         }

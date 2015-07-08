@@ -18,11 +18,9 @@ module.exports = function() {
   var plugin = this,
     host = plugin.host;
 
-  var attrServerRemote = host.get('server').remote;
-
   var core = plugin.exports = WebUploader.create($.extend(true, {
       thumb: {
-        // TODO: 内容服务，仅支持 80,120,160,240,320,480,640,960
+        // 内容服务，仅支持 80,120,160,240,320,480,640,960
         width: 120,
         height: 120,
         quality: 100,
@@ -30,12 +28,8 @@ module.exports = function() {
         type: 'jpeg'
       },
       swf: host.get('swf'),
-      // server: host.get('server'),
-      formData: attrServerRemote.formData,
-      // method: 'GET',
       // runtimeOrder: 'flash, html5',
       accept: host.get('accept'),
-      // fileSizeLimit: host.get('maxbytes'),
       fileSingleSizeLimit: host.get('maxbytes'),
       fileNumLimit: host.get('maxcount')
     }, host.get('core')))
@@ -44,19 +38,10 @@ module.exports = function() {
       return host.trigger.apply(host, arguments);
     });
 
-  // 更新 options
-  host.on('session', function(data) {
-    core.option('server', [
-        attrServerRemote.host,
-        attrServerRemote.version,
-        attrServerRemote.upload
-      ].join('/').replace('{session}', data.session || ''));
-
-    core.option('formData').path = data.path || '';
-  });
-
   // 上传
-  host.on('upload', function() {
+  host.on('upload', function(data) {
+    core.option('server', data.server);
+    core.option('formData', data.formData);
     core.upload();
   });
 
