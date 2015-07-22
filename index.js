@@ -192,19 +192,31 @@ var Upload = Widget.extend({
     },
     session: function(callback) {
       callback(false);
+    },
+    // detail: function(file, callback) {
+    //   callback(false);
+    // },
+    // upload: function(callback) {
+    //   callback(false);
+    // },
+    // download: function(file, data, callback) {
+    //   callback(false);
+    // },
+    server: {
+      value: null,
+      setter: function(val/*, key*/) {
+        if (val) {
+          ['session', 'detail', 'upload', 'download']
+          .forEach(function(key) {
+            if (val[key]) {
+              this.set(key, val[key]);
+            }
+          }, this);
+        }
+        return val;
+      }
     }
   },
-
-  initAttrs: function(config) {
-    Upload.superclass.initAttrs.call(this, config);
-
-    this.set('server', (function(val) {
-      return val ? JSON.parse(val) : {};
-    })(this.get('trigger').getAttribute('server')));
-  },
-
-  // initProps: function() {
-  // },
 
   setup: function() {
     this.on('uploadSuccess', function(file, res) {
