@@ -321,7 +321,7 @@ Upload.pluginEntry = {
     }
 
     plugin.execute = function() {
-      host.$('[type="file"]').each(function(i, field) {
+      host.$('[type="file"][name]').each(function(i, field) {
         field.type = 'hidden';
         addWidget(field.name, new Upload($.extend(true, {
           trigger: field
