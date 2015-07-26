@@ -28,36 +28,32 @@ module.exports = function() {
   var maxcount = host.get('maxcount');
 
   // 文件最大数限制
-  if (maxcount) {
-    (function() {
-      var files = host.get('files');
+  var files = host.get('files');
 
-      function togglePick() {
-        pickElem.toggleClass(
-          'webuploader-element-invisible', files.length >= maxcount);
+  function togglePick() {
+    pickElem.toggleClass(
+      'webuploader-element-invisible', files.length >= maxcount);
 
-        host.set('value', files.length ? 'fake' : '');
-      }
-
-      host.on('fileQueued', function(file) {
-        // 来自文件系统选取
-        if (file.source) {
-          files.push({
-            source: file.source,
-            id: file.id
-          });
-        }
-
-        togglePick();
-      });
-
-      host.on('fileDequeued', function(file) {
-        host.removeFile(file.id);
-
-        togglePick();
-      });
-    })();
+    host.set('value', files.length ? 'fake' : '');
   }
+
+  host.on('fileQueued', function(file) {
+    // 来自文件系统选取
+    if (file.source) {
+      files.push({
+        source: file.source,
+        id: file.id
+      });
+    }
+
+    togglePick();
+  });
+
+  host.on('fileDequeued', function(file) {
+    host.removeFile(file.id);
+
+    togglePick();
+  });
 
   // 通知就绪
   this.ready();
