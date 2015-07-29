@@ -209,7 +209,7 @@ var Upload = Widget.extend({
           ['session', 'detail', 'upload', 'download']
           .forEach(function(key) {
             if (val[key]) {
-              this.set(key, val[key]);
+              this.set(key, val[key].bind(val));
             }
           }, this);
         }
