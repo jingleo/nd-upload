@@ -13,12 +13,14 @@ module.exports = function() {
 
   var uploader = host.getPlugin('uploadCore').exports;
 
-  var pickElem = $('<div class="ui-upload-pick"></div>');
+  var pickElem = plugin.exports = $('<div class="ui-upload-pick"></div>');
+
+  var uploadQueue = host.getPlugin('uploadQueue').exports;
 
   uploader
     .addButton($.extend(true, {
-      id: host.element[0],
-      innerHTML: host.get('trigger').placeholder || '选择',
+      id: uploadQueue ? uploadQueue.element[0] : host.element[0],
+      innerHTML: host.get('trigger').placeholder || '＋',
       button: pickElem,
       multiple: host.get('multiple'),
       // 移除默认 name="file"
@@ -46,13 +48,13 @@ module.exports = function() {
       });
     }
 
-    togglePick();
+    maxcount && togglePick();
   });
 
   host.on('fileDequeued', function(file) {
     host.removeFile(file.id);
 
-    togglePick();
+    maxcount && togglePick();
   });
 
   // 通知就绪

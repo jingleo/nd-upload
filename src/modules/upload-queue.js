@@ -19,12 +19,20 @@ module.exports = Widget.extend({
     template: require('./upload-queue.handlebars')
   },
 
-  append: function(item) {
-    this.element.append(item.element);
+  append: function(item, before) {
+    if (before) {
+      item.element.insertBefore(before);
+    } else {
+      this.element.append(item.element);
+    }
   },
 
-  prepend: function(item) {
-    this.element.prepend(item.element);
+  prepend: function(item, after) {
+    if (after) {
+      item.element.insertAfter(after);
+    } else {
+      this.element.prepend(item.element);
+    }
   }
 
 });

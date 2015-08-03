@@ -5,14 +5,12 @@
 
 'use strict';
 
-var debug = require('nd-debug');
-
 var UploadQueue = require('../modules/upload-queue');
 var UploadFile = require('../modules/upload-file');
 
 var MIME_TYPES = require('../vendor/mimetypes');
 
-var BLANK = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
+var BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
 
 module.exports = function() {
   var plugin = this,
@@ -20,7 +18,7 @@ module.exports = function() {
 
   var uploader = host.getPlugin('uploadCore').exports;
 
-  var uploadQueue = new UploadQueue({
+  var uploadQueue = plugin.exports = new UploadQueue({
     parentNode: host.element,
     insertInto: function(element, parentNode) {
       element.prependTo(parentNode);
@@ -72,7 +70,7 @@ module.exports = function() {
       } else {
         host.trigger('fileDequeued', file);
       }
-    }).render());
+    }).render(), host.getPlugin('uploadPick').exports);
   }
 
   // 缩略图
