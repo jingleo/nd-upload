@@ -1,5 +1,4 @@
 {
-  " 上传失败，请检查网络连接": "",
   " 个文件": " files",
   " 文件": " file",
   "下载": "Download",
@@ -7,7 +6,7 @@
   "只支持上传 ": "Only support ",
   "您无法进行下一步操作，因为文件上传功能需要更高版本（或支持 Flash 播放器）的浏览器。": "Failed to proceed to the next step. Uploading requires a higher version browser (or supports Flash player).",
   "按钮指定错误": "Button error.",
-  "文件 ": "file",
+  "文件 ": "file ",
   "文件 {name} 不合格或是空文件": "File {name} is illegal or empty.",
   "文件大小不能大于 ": "The size can\\'t be bigger than ",
   "文件总大小不能大于 ": "The total size can\\'t be bigger than ",
@@ -16,5 +15,7 @@
   "移除": "Remove",
   "选择": "Select",
   "选择文件": "Select file",
-  "预览错误": "Preview error."
+  "预览错误": "Preview error.",
+  " 上传失败，请检查网络连接": " uploading failed. Please check connection.",
+  "请选择上传文件": "Please select file to upload"
 }

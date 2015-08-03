@@ -274,11 +274,13 @@ var Upload = Widget.extend({
 
     function complete() {
       var hasErr = false;
+      var value = that._getFilesValue();
 
-      that.set('value', that._getFilesValue());
+      that.set('value', value);
 
-      if (that.get('required') && !that.get('value')) {
+      if (that.get('required') && (!value || !value.length)) {
         hasErr = true;
+        that.trigger('error', 'Q_EMPTY');
         $(that.get('trigger')).trigger('blur');
       }
 

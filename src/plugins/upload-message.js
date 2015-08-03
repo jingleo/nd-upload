@@ -28,6 +28,7 @@ module.exports = function() {
   var restoreValue;
 
   var _messages = {
+    'Q_EMPTY':             '请选择上传文件',
     // 目前不支持
     // 'Q_EXCEED_SIZE_LIMIT':  '文件总大小不能大于 ' + host.get('maxbytesq'),
     // 队列
