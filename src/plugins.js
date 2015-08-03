@@ -6,12 +6,12 @@ module.exports = [
     starter: require('./plugins/upload-core')
   },
   {
-    name: 'uploadPick',
-    starter: require('./plugins/upload-pick')
-  },
-  {
     name: 'uploadQueue',
     starter: require('./plugins/upload-queue')
+  },
+  {
+    name: 'uploadPick',
+    starter: require('./plugins/upload-pick')
   },
   {
     name: 'uploadMessage',
