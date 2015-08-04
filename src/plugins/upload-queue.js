@@ -10,7 +10,7 @@ var UploadFile = require('../modules/upload-file');
 
 var MIME_TYPES = require('../vendor/mimetypes');
 
-var BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
+var BLANK = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
 
 module.exports = function() {
   var plugin = this,
@@ -63,6 +63,8 @@ module.exports = function() {
 
     uploadQueue.append(new UploadFile({
       model: file
+    }).after('render', function() {
+      file.widget = this;
     }).before('destroy', function() {
       // model === WUFile === file === this.get('model')
       if (file.source) {

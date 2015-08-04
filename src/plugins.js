@@ -14,6 +14,10 @@ module.exports = [
     starter: require('./plugins/upload-pick')
   },
   {
+    name: 'uploadProgress',
+    starter: require('./plugins/upload-progress')
+  },
+  {
     name: 'uploadMessage',
     starter: require('./plugins/upload-message')
   }
