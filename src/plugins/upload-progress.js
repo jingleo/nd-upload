@@ -10,16 +10,16 @@ module.exports = function() {
     host = plugin.host;
 
   host.on('uploadStart', function(file) {
-    file.widget.$('[data-role="file-progress"]').addClass('active');
+     file.widget.$('[data-role="file-progress"]').addClass('active');
   });
 
   host.on('uploadProgress', function(file, percentage) {
     var progressbar = file.widget.$('[data-role="file-progress"]');
 
-    progressbar.css('width', percentage * 100 + '%');
+    progressbar.css('width', (1-percentage) * 100 + '%');
 
     if (percentage === 1) {
-      progressbar.css('width', 0).removeClass('active');
+       progressbar.removeClass('active');
     }
   });
 
