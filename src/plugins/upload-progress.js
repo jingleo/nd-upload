@@ -15,12 +15,12 @@ module.exports = function() {
 
   host.on('uploadProgress', function(file, percentage) {
     var progressbar = file.widget.$('[data-role="file-progress"]');
-
     progressbar.css('width', (1 - percentage) * 100 + '%');
+  });
 
-    if (percentage === 1) {
-      progressbar.removeClass('active').append('<span class="iconfont iconfont-ok"></span>');
-    }
+  host.on('uploadSuccess', function(file) {
+    var progressbar = file.widget.$('[data-role="file-progress"]');
+    progressbar.removeClass('active').html('<span class="iconfont iconfont-ok"></span>');
   });
 
   // 通知就绪
