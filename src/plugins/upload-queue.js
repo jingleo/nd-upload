@@ -10,7 +10,7 @@ var UploadFile = require('../modules/upload-file');
 
 var MIME_TYPES = require('../vendor/mimetypes');
 
-var BLANK = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs%3D';
+var BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
 
 module.exports = function() {
   var plugin = this,
@@ -65,6 +65,7 @@ module.exports = function() {
       model: file
     }).after('render', function() {
       file.widget = this;
+      host.trigger('fileRendered', file);
     }).before('destroy', function() {
       // model === WUFile === file === this.get('model')
       if (file.source) {
