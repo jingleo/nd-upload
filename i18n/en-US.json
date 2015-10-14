@@ -1,4 +1,5 @@
 {
+  " 上传失败，请检查网络连接": " uploading failed. Please check connection.",
   " 个文件": " files",
   " 文件": " file",
   "下载": "Download",
@@ -13,9 +14,8 @@
   "最多允许上传 ": "Maximum upload ",
   "未知错误": "Unknown error.",
   "移除": "Remove",
-  "选择": "Select",
+  "请选择上传文件": "Please select file to upload",
   "选择文件": "Select file",
   "预览错误": "Preview error.",
-  " 上传失败，请检查网络连接": " uploading failed. Please check connection.",
-  "请选择上传文件": "Please select file to upload"
+  "＋": ""
 }

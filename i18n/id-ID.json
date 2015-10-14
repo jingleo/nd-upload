@@ -1,0 +1,21 @@
+{
+  " 上传失败，请检查网络连接": "Gagal mengunggah, Periksa jaringan.",
+  " 个文件": " berkas",
+  " 文件": " berkas",
+  "下载": "Unduh",
+  "不允许重复选择文件": "Tidak dapat memilih berkas secara berulang.",
+  "只支持上传 ": "Hanya mendukung ",
+  "您无法进行下一步操作，因为文件上传功能需要更高版本（或支持 Flash 播放器）的浏览器。": "Gagal memproses ke tahap selanjutnya. Mengunggah butuh browser terbaru (Atau dukungan Flash player).",
+  "按钮指定错误": "Kesalahan tombol.",
+  "文件 ": "Berkas ",
+  "文件 {name} 不合格或是空文件": "Berkas {name} Ilegal atau kosong.",
+  "文件大小不能大于 ": "Ukuran tidak boleh lebih besar ",
+  "文件总大小不能大于 ": "Total ukuran tidak boleh lebih besar ",
+  "最多允许上传 ": "Unggahan Maksimal ",
+  "未知错误": "Kesalahan tidak diketahui.",
+  "移除": "Hapus",
+  "请选择上传文件": "Pilih berkas yang akan diunggah",
+  "选择文件": "Pilih Berkas",
+  "预览错误": "Keaslahan Tinjauan.",
+  "＋": "＋"
+}
