@@ -24,7 +24,8 @@
       "jquery": "1.11.1",
       "nd-debug":"1.0.0",
       "nd-template": "1.0.0",
-      "nd-widget": "1.0.0"
+      "nd-widget": "1.0.0",
+      "nd-dns": "1.0.1"
     },
     "devDependencies": {
       "expect.js": "0.3.1"
