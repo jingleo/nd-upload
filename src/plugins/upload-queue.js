@@ -19,10 +19,13 @@ module.exports = function() {
   var uploader = host.getPlugin('uploadCore').exports;
 
   var uploadQueue = plugin.exports = new UploadQueue({
+    dragable: host.get('dragable'),
     parentNode: host.element,
     insertInto: function(element, parentNode) {
       element.prependTo(parentNode);
     }
+  }).on('drop', function(action, eleFile, dropFile) {
+    host.resortFiles(action, eleFile.get('model'), dropFile.get('model'));
   }).render();
 
   var optThumb = uploader.option('thumb');
@@ -61,19 +64,21 @@ module.exports = function() {
     file.width = optThumb.width;
     file.height = optThumb.height;
 
-    uploadQueue.append(new UploadFile({
+    uploadQueue.addFile(new UploadFile({
       model: file
     }).after('render', function() {
       file.widget = this;
       host.trigger('fileRendered', file);
-    }).before('destroy', function() {
+    }).on('remove', function() {
       // model === WUFile === file === this.get('model')
       if (file.source) {
         uploader.removeFile(file, true);
       } else {
         host.trigger('fileDequeued', file);
       }
-    }).render(), host.getPlugin('uploadPick').exports);
+      // this就是当前UploadFile对象
+      uploadQueue.removeFile(this);
+    }), host.getPlugin('uploadPick').exports);
   }
 
   // 缩略图

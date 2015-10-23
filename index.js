@@ -127,6 +127,16 @@ var Upload = Widget.extend({
         return val;
       }
     },
+    dragable: {
+      value: null, // required
+      getter: function(val, key) {
+        if (typeof val !== 'boolean') {
+          this.attrs[key].value = val = !!$(this.get('trigger')).attr('dragable');
+        }
+
+        return val;
+      }
+    },
     maxbytes: {
       value: null, // required
       getter: function(val, key) {
@@ -304,6 +314,39 @@ var Upload = Widget.extend({
       // for plugin
       that.trigger('upload', data);
     });
+  },
+  resortFiles: function(action, element, drop) {
+    var files = this.get('files');
+    var i;
+    var item = null;
+    var eleFile = null;
+    var dropFile = null;
+    var dropIndex = -1;
+
+    for (i = 0; i < files.length; i++) {
+      item = files[i];
+      if (item.id === element.id) {
+        eleFile = files[i];
+        break;
+      }
+    }
+    // 移除
+    files.splice(i, 1);
+
+    for(i=0; i<files.length; i++) {
+      item = files[i];
+      if (item.id == drop.id) {
+        dropFile = files[i];
+        dropIndex = i;
+        break;
+      }
+    }
+    //调整位置
+    if (action === 'insertBefore') {
+      files.splice(dropIndex, 0, eleFile);
+    } else if(action === 'insertAfter') {
+      files.splice(dropIndex+1, 0, eleFile);
+    }
   }
 
 });

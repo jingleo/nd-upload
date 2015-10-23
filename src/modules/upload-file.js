@@ -8,7 +8,7 @@
 var Widget = require('nd-widget');
 var Template = require('nd-template');
 
-module.exports = Widget.extend({
+var UploadFile = Widget.extend({
 
   // 使用 handlebars
   Implements: [Template],
@@ -20,7 +20,14 @@ module.exports = Widget.extend({
   },
 
   events: {
-    'click [data-role="remove-file"]': 'destroy'
+    'click [data-role="remove-file"]': 'remove'
+  },
+  remove: function() {
+    // 通知容器对象UploadQueue执行清除动作
+    this.trigger('remove');
+    //销毁该对象
+    UploadFile.superclass.destroy.call(this);
   }
-
 });
+
+module.exports = UploadFile;
