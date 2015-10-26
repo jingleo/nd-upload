@@ -37,7 +37,8 @@ module.exports = function() {
 
     var ENUM = [' B', ' KB', ' MB', ' GB', ' TB'];
 
-    var i = 0, kilo = 1024;
+    var i = 0,
+      kilo = 1024;
 
     while (size > kilo) {
       size /= kilo;
@@ -81,6 +82,12 @@ module.exports = function() {
     }), host.getPlugin('uploadPick').exports);
   }
 
+  function filesQueued(files) {
+    files.forEach(function(file) {
+      host.trigger('fileQueued', file);
+    });
+  }
+
   // 缩略图
   host.on('fileQueued', function(file) {
     file.isImage || (file.isImage = file.type && /^image\//.test(file.type));
@@ -119,15 +126,21 @@ module.exports = function() {
     uploadQueue.destroy();
   });
 
-  // 已有的图片（场景：如编辑）
-  host.get('files').forEach(function(file) {
+  // 已有的图片（场景：如编辑）,按顺序显示
+  var files = host.get('files');
+  var fLen = files.length;
+  var count = 0;
+  files.forEach(function(file) {
     host.get('detail')(file, function(file) {
       if ((file.type && /^image\//.test(file.type))) {
         host.get('download')(file, {
           size: 120
         }, function(file) {
           file.isImage = true;
-          host.trigger('fileQueued', file);
+          count++;
+          if (count === fLen) {
+            filesQueued(files);
+          }
         });
       } else {
         host.get('download')(file, {
@@ -135,7 +148,10 @@ module.exports = function() {
           name: file.name
         }, function(file) {
           file.canDownload = true;
-          host.trigger('fileQueued', file);
+          count++;
+          if (count === fLen) {
+            filesQueued(files);
+          }
         });
       }
     });
