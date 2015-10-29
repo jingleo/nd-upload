@@ -88,6 +88,17 @@ module.exports = function() {
     }
   });
 
+  // webuuploader中maxcount不包括已上传文件
+  // 实际应用时，maxcount包括已上传文件。需要额外判断
+  host.on('beforeFileQueued', function() {
+    if (host.get('files').length >= host.get('maxcount')) {
+      host.trigger( 'error', 'Q_EXCEED_NUM_LIMIT');
+      return false;
+    } else {
+      return true;
+    }
+  });
+
   host.before('destroy', function() {
     container.off().remove();
   });
