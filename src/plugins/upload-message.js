@@ -94,8 +94,6 @@ module.exports = function() {
     if (host.get('files').length >= host.get('maxcount')) {
       host.trigger( 'error', 'Q_EXCEED_NUM_LIMIT');
       return false;
-    } else {
-      return true;
     }
   });
 
