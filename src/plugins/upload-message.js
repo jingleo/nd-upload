@@ -10,7 +10,8 @@ var $ = require('jquery');
 function sizePrettify(size) {
   var ENUM = [' B', ' KB', ' MB', ' GB', ' TB'];
 
-  var i = 0, kilo = 1024;
+  var i = 0,
+    kilo = 1024;
 
   while (size > kilo) {
     size /= kilo;
@@ -26,31 +27,32 @@ module.exports = function() {
 
   var hasErr;
   var restoreValue;
+  var maxcount = host.get('maxcount');
 
   var _messages = {
-    'Q_EMPTY':             '请选择上传文件',
+    'Q_EMPTY': '请选择上传文件',
     // 目前不支持
     // 'Q_EXCEED_SIZE_LIMIT':  '文件总大小不能大于 ' + host.get('maxbytesq'),
     // 队列
-    'Q_EXCEED_NUM_LIMIT':   '最多允许上传 ' + host.get('maxcount') + ' 个文件',
-    'Q_TYPE_DENIED':        '只支持上传 ' + host.get('accept').mimeTypes + ' 文件',
-    'Q_EMPTY_FILE':         '文件 {name} 不合格或是空文件',
+    'Q_EXCEED_NUM_LIMIT': '最多允许上传 ' + maxcount + ' 个文件',
+    'Q_TYPE_DENIED': '只支持上传 ' + host.get('accept').mimeTypes + ' 文件',
+    'Q_EMPTY_FILE': '文件 {name} 不合格或是空文件',
     // 文件
-    'F_EXCEED_SIZE':        '文件大小不能大于 ' + sizePrettify(host.get('maxbytes')),
-    'F_DUPLICATE':          '不允许重复选择文件'
+    'F_EXCEED_SIZE': '文件大小不能大于 ' + sizePrettify(host.get('maxbytes')),
+    'F_DUPLICATE': '不允许重复选择文件'
   };
 
   var container = $('<div class="ui-upload-message" />')
-      .on('mouseout', function(e) {
-        setTimeout(function() {
-          e.target.style.display = 'none';
-          if (restoreValue) {
-            restoreValue = false;
-            host.set('value', '');
-          }
-        }, 500);
-      })
-      .appendTo(host.element);
+    .on('mouseout', function(e) {
+      setTimeout(function() {
+        e.target.style.display = 'none';
+        if (restoreValue) {
+          restoreValue = false;
+          host.set('value', '');
+        }
+      }, 500);
+    })
+    .appendTo(host.element);
 
   var showMessage = function(text) {
     if (!host.get('value')) {
@@ -88,14 +90,17 @@ module.exports = function() {
     }
   });
 
-  // webuuploader中maxcount不包括已上传文件
-  // 实际应用时，maxcount包括已上传文件。需要额外判断
-  host.on('beforeFileQueued', function() {
-    if (host.get('files').length >= host.get('maxcount')) {
-      host.trigger( 'error', 'Q_EXCEED_NUM_LIMIT');
-      return false;
-    }
-  });
+  // 当且仅当设置了最大数量
+  if (maxcount) {
+    // webuuploader 中 maxcount 不包括已上传文件
+    // 实际应用时，maxcount 包括已上传文件。需要额外判断
+    host.on('beforeFileQueued', function() {
+      if (host.get('files').length >= maxcount) {
+        host.trigger('error', 'Q_EXCEED_NUM_LIMIT');
+        return false;
+      }
+    });
+  }
 
   host.before('destroy', function() {
     container.off().remove();
