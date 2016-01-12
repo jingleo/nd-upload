@@ -24,18 +24,18 @@ var UploadFile = Widget.extend({
   },
 
   events: {
-    'click [data-role="remove-file"]': 'remove'
+    'click [data-role="remove-file"]': 'destroy'
   },
 
-  remove: function() {
-    // 通知容器对象UploadQueue执行清除动作
-    this.trigger('remove');
-    //销毁该对象
-    UploadFile.superclass.destroy.call(this);
-  },
+  // remove: function() {
+  //   // 通知容器对象UploadQueue执行清除动作
+  //   this.trigger('remove');
+  //   //销毁该对象
+  //   UploadFile.superclass.destroy.call(this);
+  // },
 
-  _onRenderModel: function(model) {
-    this._renderPartial(model);
+  update: function(file) {
+    this._renderPartial(file);
   },
 
   _renderPartial: function(file) {

@@ -19,7 +19,7 @@ module.exports = function() {
   var uploader = host.getPlugin('uploadCore').exports;
 
   var uploadQueue = plugin.exports = new UploadQueue({
-    dragable: host.get('dragable'),
+    draggable: host.get('draggable'),
     parentNode: host.element,
     insertInto: function(element, parentNode) {
       element.prependTo(parentNode);
@@ -60,13 +60,11 @@ module.exports = function() {
     return 'unknown';
   }
 
-  function makeThumb(file) {
-    file.isImage || (file.isImage = file.type && /^image\//.test(file.type));
-
+  function makeThumb(file, widget) {
     function update() {
-      file.widget.set('model', file, {
-        override: true
-      });
+      widget.update(file);
+      file.widget = widget;
+      host.trigger('fileRendered', file);
     }
 
     if (file.isImage) {
@@ -101,14 +99,14 @@ module.exports = function() {
 
   /* helpers */
   function appendFile(file) {
+    console.log('[data]', file)
     file.width = optThumb.width;
     file.height = optThumb.height;
 
-    uploadQueue.append(new UploadFile({
+    uploadQueue.addFile(new UploadFile({
       model: file
     }).after('render', function() {
-      file.widget = this;
-      host.trigger('fileRendered', file);
+      var widget = this;
 
       host.get('detail')(file, function(file) {
         if ((file.type && /^image\//.test(file.type))) {
@@ -116,7 +114,8 @@ module.exports = function() {
             size: 120
           }, function(file) {
             file.isImage = true;
-            makeThumb(file);
+            console.log('[data]', '1')
+            makeThumb(file, widget);
           });
         } else {
           host.get('download')(file, {
@@ -124,7 +123,8 @@ module.exports = function() {
             name: file.name
           }, function(file) {
             file.canDownload = true;
-            makeThumb(file);
+            console.log('[data]', '2')
+            makeThumb(file, widget);
           });
         }
       });
@@ -136,6 +136,9 @@ module.exports = function() {
       } else {
         host.trigger('fileDequeued', file);
       }
+
+      // this 就是当前 UploadFile 对象
+      uploadQueue.removeFile(this);
     }).render(), host.getPlugin('uploadPick').exports);
   }
 

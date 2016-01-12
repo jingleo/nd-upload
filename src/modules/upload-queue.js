@@ -39,50 +39,59 @@ var UploadQueue = Widget.extend({
       this.element.prepend(item.element);
     }
   },
+
   addFile: function(uploadFile, uploadPick) {
     if (!uploadFile) {
       return;
     }
-    var files = this.get('files');
+
+    this.get('files').push(uploadFile);
+    this.append(uploadFile, uploadPick);
+
     var dns = this.get('dns');
-    var dragable = this.get('dragable');
-    files.push(uploadFile);
-    this.append(uploadFile.render(), uploadPick);
+    var draggable = this.get('draggable');
+
     // 如果可拖曳，添加到拖曳列表
-    if (dns && dragable) {
+    if (dns && draggable) {
       dns.addElement(uploadFile.element[0]);
       dns.addDrop(uploadFile.element[0]);
     }
   },
+
   removeFile: function(uploadFile) {
     if (!uploadFile) {
       return;
     }
 
-    var files = this.get('files');
     var dns = this.get('dns');
-    var i = 0;
-    var dragable = this.get('dragable');
+    var draggable = this.get('draggable');
+
     // 移除拖动列表中的对应项
-    if (dns && dragable) {
+    if (dns && draggable) {
       dns.removeDrop(uploadFile.element[0]);
     }
+
+    var files = this.get('files');
+    var i = 0;
+
     // 移除出队列
-    for(i=0; i<files.length; i++) {
-      if (files[i] == uploadFile) {
+    for (i = 0; i < files.length; i++) {
+      if (files[i] === uploadFile) {
         break;
       }
     }
+
     files.splice(i, 1);
   },
+
   render: function() {
     UploadQueue.superclass.render.call(this);
 
-    var dns = null;
-    var that = this;
-    var dragable = this.get('dragable');
-    if (dragable) {
-      dns = new Dns({
+    var draggable = this.get('draggable');
+
+    if (draggable) {
+      var that = this;
+      var dns = new Dns({
         containment: this.element,
         elements: [],
         drops: [],
@@ -92,7 +101,7 @@ var UploadQueue = Widget.extend({
           return !/^INPUT|SELECT|TEXTAREA|BUTTON$/.test(target.tagName);
         }
       }).on('drop', function(dataTransfer, $element, $drop) {
-          that.resortFiles(dataTransfer, $element, $drop);
+        that.resortFiles(dataTransfer, $element, $drop);
       });
 
       Dns.open();
@@ -102,10 +111,12 @@ var UploadQueue = Widget.extend({
 
     return this;
   },
+
   resortFiles: function(dataTransfer, $element, $drop) {
     if (!$element) {
       return;
     }
+
     if (!$drop) {
       return;
     }
@@ -115,33 +126,38 @@ var UploadQueue = Widget.extend({
     var eleFile = null;
     var dropFile = null;
     var dropIndex = -1;
-    for (i=0; i<files.length; i++) {
+
+    for (i = 0; i < files.length; i++) {
       if (files[i].element[0] == $element[0]) {
         eleFile = files[i];
         break;
       }
     }
+
     // 先移除element File
     files.splice(i, 1);
 
-    for (i=0; i<files.length; i++) {
+    for (i = 0; i < files.length; i++) {
       if (files[i].element[0] == $drop[0]) {
         dropFile = files[i];
         dropIndex = i;
         break;
       }
     }
+
     if (dataTransfer.action === 'insertBefore') {
       files.splice(dropIndex, 0, eleFile);
-    } else if(dataTransfer.action === 'insertAfter') {
-      files.splice(dropIndex+1, 0, eleFile);
+    } else if (dataTransfer.action === 'insertAfter') {
+      files.splice(dropIndex + 1, 0, eleFile);
     }
 
     this.trigger('drop', dataTransfer.action, eleFile, dropFile);
   },
+
   destroy: function() {
     //销毁dns对象
     var dns = this.get('dns');
+
     if (dns) {
       dns.destroy();
     }
@@ -149,7 +165,8 @@ var UploadQueue = Widget.extend({
     // 销毁files对象
     var files = this.get('files');
     var i = 0;
-    for(i=0; i<files.length; i++) {
+
+    for (i = 0; i < files.length; i++) {
       files[i].destroy();
     }
 
@@ -159,6 +176,7 @@ var UploadQueue = Widget.extend({
 
     UploadQueue.superclass.destroy.call(this);
   }
+
 });
 
 module.exports = UploadQueue;
