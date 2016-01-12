@@ -99,7 +99,6 @@ module.exports = function() {
 
   /* helpers */
   function appendFile(file) {
-    console.log('[data]', file)
     file.width = optThumb.width;
     file.height = optThumb.height;
 
@@ -114,7 +113,6 @@ module.exports = function() {
             size: 120
           }, function(file) {
             file.isImage = true;
-            console.log('[data]', '1')
             makeThumb(file, widget);
           });
         } else {
@@ -123,7 +121,6 @@ module.exports = function() {
             name: file.name
           }, function(file) {
             file.canDownload = true;
-            console.log('[data]', '2')
             makeThumb(file, widget);
           });
         }
