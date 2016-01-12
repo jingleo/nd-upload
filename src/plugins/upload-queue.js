@@ -60,47 +60,24 @@ module.exports = function() {
     return 'unknown';
   }
 
-  /* helpers */
-  function appendFile(file) {
-    file.width = optThumb.width;
-    file.height = optThumb.height;
-
-    uploadQueue.addFile(new UploadFile({
-      model: file
-    }).after('render', function() {
-      file.widget = this;
-      host.trigger('fileRendered', file);
-    }).on('remove', function() {
-      // model === WUFile === file === this.get('model')
-      if (file.source) {
-        uploader.removeFile(file, true);
-      } else {
-        host.trigger('fileDequeued', file);
-      }
-      // this就是当前UploadFile对象
-      uploadQueue.removeFile(this);
-    }), host.getPlugin('uploadPick').exports);
-  }
-
-  function filesQueued(files) {
-    files.forEach(function(file) {
-      host.trigger('fileQueued', file);
-    });
-  }
-
-  // 缩略图
-  host.on('fileQueued', function(file) {
+  function makeThumb(file) {
     file.isImage || (file.isImage = file.type && /^image\//.test(file.type));
+
+    function update() {
+      file.widget.set('model', file, {
+        override: true
+      });
+    }
 
     if (file.isImage) {
       if (file.source) {
         uploader.makeThumb(file, function(err, src) {
           file.src = err ? BLANK : src;
 
-          appendFile(file);
+          update();
         });
       } else {
-        appendFile(file);
+        update();
       }
     }
     // 其它
@@ -118,44 +95,70 @@ module.exports = function() {
       file.iconType = iconType(file.type, file.ext);
       file.prettySize = prettySize(file.size);
 
-      appendFile(file);
+      update();
     }
+  }
+
+  /* helpers */
+  function appendFile(file) {
+    file.width = optThumb.width;
+    file.height = optThumb.height;
+
+    uploadQueue.append(new UploadFile({
+      model: file
+    }).after('render', function() {
+      file.widget = this;
+      host.trigger('fileRendered', file);
+
+      host.get('detail')(file, function(file) {
+        if ((file.type && /^image\//.test(file.type))) {
+          host.get('download')(file, {
+            size: 120
+          }, function(file) {
+            file.isImage = true;
+            makeThumb(file);
+          });
+        } else {
+          host.get('download')(file, {
+            attachment: true,
+            name: file.name
+          }, function(file) {
+            file.canDownload = true;
+            makeThumb(file);
+          });
+        }
+      });
+
+    }).before('destroy', function() {
+      // model === WUFile === file === this.get('model')
+      if (file.source) {
+        uploader.removeFile(file, true);
+      } else {
+        host.trigger('fileDequeued', file);
+      }
+    }).render(), host.getPlugin('uploadPick').exports);
+  }
+
+  // 缩略图
+  host.on('fileQueued', function(file) {
+    appendFile(file);
   });
 
   host.before('destroy', function() {
     uploadQueue.destroy();
   });
 
-  // 已有的图片（场景：如编辑）,按顺序显示
-  var files = host.get('files');
-  var fLen = files.length;
-  var count = 0;
-  files.forEach(function(file) {
-    host.get('detail')(file, function(file) {
-      if ((file.type && /^image\//.test(file.type))) {
-        host.get('download')(file, {
-          size: 120
-        }, function(file) {
-          file.isImage = true;
-          count++;
-          if (count === fLen) {
-            filesQueued(files);
-          }
-        });
-      } else {
-        host.get('download')(file, {
-          attachment: true,
-          name: file.name
-        }, function(file) {
-          file.canDownload = true;
-          count++;
-          if (count === fLen) {
-            filesQueued(files);
-          }
-        });
-      }
-    });
-  });
+  var currentFiles = host.get('files');
+
+  // 已有的图片（场景：如编辑）
+  if (currentFiles.length) {
+    // 异步，确保 plugins/upload-pick 先行
+    setTimeout(function() {
+      currentFiles.forEach(function(file) {
+        host.trigger('fileQueued', file);
+      });
+    }, 0);
+  }
 
   // 通知就绪
   this.ready();

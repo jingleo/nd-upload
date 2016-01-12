@@ -1,0 +1,15 @@
+<div class="{{classPrefix}}-buttons">
+  <span title="移除" class="iconfont iconfont-remove {{classPrefix}}-remove" data-role="remove-file"></span>{{#if canDownload}}<a title="下载" class="iconfont iconfont-download {{classPrefix}}-download" href="{{src}}"></a>{{/if}}
+</div>
+<div class="{{classPrefix}}-progress" data-role="file-progress"></div>
+<div class="{{classPrefix}}-imgbox" data-role="imgbox">
+  {{#if isImage}}
+    <img class="{{classPrefix}}-img" src="{{src}}" width="{{width}}" height="{{height}}" alt="{{name}}">
+  {{else}}
+    <div class="{{classPrefix}}-box">
+      <div class="{{classPrefix}}-icon fileicon-{{iconType}}"></div>
+      <div class="{{classPrefix}}-name">{{name}}</div>
+      <div class="{{classPrefix}}-size">{{prettySize}}</div>
+    </div>
+  {{/if}}
+</div>
