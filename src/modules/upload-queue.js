@@ -72,16 +72,16 @@ var UploadQueue = Widget.extend({
     }
 
     var files = this.get('files');
-    var i = 0;
 
-    // 移除出队列
-    for (i = 0; i < files.length; i++) {
-      if (files[i] === uploadFile) {
-        break;
-      }
+    if (files) {
+      files.some(function(file, index) {
+        if (file === uploadFile) {
+          // 移除出队列
+          files.splice(index, 1);
+          return true;
+        }
+      });
     }
-
-    files.splice(i, 1);
   },
 
   render: function() {
@@ -122,36 +122,37 @@ var UploadQueue = Widget.extend({
     }
 
     var files = this.get('files');
-    var i = 0;
     var eleFile = null;
     var dropFile = null;
     var dropIndex = -1;
 
-    for (i = 0; i < files.length; i++) {
-      if (files[i].element[0] == $element[0]) {
-        eleFile = files[i];
-        break;
+    if (files) {
+      files.some(function(file, index) {
+        if (file.element[0] === $element[0]) {
+          // 移除并赋值
+          eleFile = files.splice(index, 1)[0];
+          return true;
+        }
+      });
+
+      files.some(function(file, index) {
+        if (file.element[0] === $drop[0]) {
+          dropFile = file;
+          dropIndex = index;
+          return true;
+        }
+      });
+    }
+
+    if (eleFile && dropFile) {
+      if (dataTransfer.action === 'insertBefore') {
+        files.splice(dropIndex, 0, eleFile);
+      } else if (dataTransfer.action === 'insertAfter') {
+        files.splice(dropIndex + 1, 0, eleFile);
       }
+
+      this.trigger('drop', dataTransfer.action, eleFile, dropFile);
     }
-
-    // 先移除element File
-    files.splice(i, 1);
-
-    for (i = 0; i < files.length; i++) {
-      if (files[i].element[0] == $drop[0]) {
-        dropFile = files[i];
-        dropIndex = i;
-        break;
-      }
-    }
-
-    if (dataTransfer.action === 'insertBefore') {
-      files.splice(dropIndex, 0, eleFile);
-    } else if (dataTransfer.action === 'insertAfter') {
-      files.splice(dropIndex + 1, 0, eleFile);
-    }
-
-    this.trigger('drop', dataTransfer.action, eleFile, dropFile);
   },
 
   destroy: function() {
@@ -164,10 +165,11 @@ var UploadQueue = Widget.extend({
 
     // 销毁files对象
     var files = this.get('files');
-    var i = 0;
 
-    for (i = 0; i < files.length; i++) {
-      files[i].destroy();
+    if (files) {
+      files.forEach(function(file, index) {
+        file && file.destroy && file.destroy();
+      });
     }
 
     // 清除属性对象

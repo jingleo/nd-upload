@@ -34,6 +34,10 @@ var UploadFile = Widget.extend({
   //   UploadFile.superclass.destroy.call(this);
   // },
 
+  setup: function() {
+    this._renderPartial(this.get('model'));
+  },
+
   update: function(file) {
     this._renderPartial(file);
   },
