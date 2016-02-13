@@ -1,12 +1,16 @@
 {
   "name": "nd-upload",
-  "version": "1.0.1",
+  "version": "3.0.0",
   "description": "基于 WebUploader 的上传组件",
   "keywords": [],
   "homepage": "https://github.com/ndfront/nd-upload",
   "author": {
     "name": "crossjs",
     "email": "liwenfu@crossjs.com"
+  },
+  "scripts": {
+    "test": "mocha --bail --timeout 200 --slow 99999 tests/**/*-spec.js",
+    "coverage": "node_modules/isparta/bin/isparta cover node_modules/mocha/bin/_mocha -- --bail --timeout 200 --slow 99999 -R dot tests/**/*-spec.js"
   },
   "repository": {
     "type": "git",
@@ -16,19 +20,19 @@
     "url": "https://github.com/ndfront/nd-upload/issues"
   },
   "licenses": "MIT",
-  "devDependencies": {},
-  "spm": {
-    "main": "index.js",
-    "dependencies": {
-      "handlebars-runtime": "3.0.1",
-      "jquery": "1.11.1",
-      "nd-debug":"1.0.0",
-      "nd-template": "1.0.0",
-      "nd-widget": "1.0.0",
-      "nd-dns": "1.0.1"
-    },
-    "devDependencies": {
-      "expect.js": "0.3.1"
-    }
+  "main": "index.js",
+  "dependencies": {
+    "handlebars": "^4.0.5",
+    "jquery": "^1.11.1",
+    "nd-debug": "^3.0.0",
+    "nd-dns": "^3.0.0",
+    "nd-i18n": "^3.0.0",
+    "nd-template": "^3.0.0",
+    "nd-widget": "^3.0.0"
+  },
+  "devDependencies": {
+    "expect.js": "^0.3.1",
+    "isparta": "^4.0.0",
+    "mocha": "^2.4.5"
   }
 }

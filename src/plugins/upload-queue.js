@@ -85,7 +85,7 @@ module.exports = function() {
       if (!file.ext) {
         file.ext = file.name.match(/\.(.+)?$/);
 
-        if (file.ext && file.ext < 6) {
+        if (file.ext && file.ext[1].length < 6) {
           file.ext = file.ext[1];
         }
       }
@@ -112,6 +112,10 @@ module.exports = function() {
           host.get('download')(file, {
             size: 120
           }, function(file) {
+            if (file.src) {
+              file.canDownload = true;
+              file.srcDownload = file.src.replace('&size=120', '');
+            }
             file.isImage = true;
             makeThumb(file, widget);
           });

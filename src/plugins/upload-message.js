@@ -6,6 +6,7 @@
 'use strict';
 
 var $ = require('jquery');
+var __ = require('nd-i18n');
 
 function sizePrettify(size) {
   var ENUM = [' B', ' KB', ' MB', ' GB', ' TB'];
@@ -30,16 +31,16 @@ module.exports = function() {
   var maxcount = host.get('maxcount');
 
   var _messages = {
-    'Q_EMPTY': '请选择上传文件',
+    'Q_EMPTY': __('请选择上传文件'),
     // 目前不支持
-    // 'Q_EXCEED_SIZE_LIMIT':  '文件总大小不能大于 ' + host.get('maxbytesq'),
+    // 'Q_EXCEED_SIZE_LIMIT':  __('文件总大小不能大于 ') + host.get('maxbytesq'),
     // 队列
-    'Q_EXCEED_NUM_LIMIT': '最多允许上传 ' + maxcount + ' 个文件',
-    'Q_TYPE_DENIED': '只支持上传 ' + host.get('accept').mimeTypes + ' 文件',
-    'Q_EMPTY_FILE': '文件 {name} 不合格或是空文件',
+    'Q_EXCEED_NUM_LIMIT': __('最多允许上传 ') + maxcount + __(' 个文件'),
+    'Q_TYPE_DENIED': __('只支持上传 ') + host.get('accept').mimeTypes + __(' 文件'),
+    'Q_EMPTY_FILE': __('文件 {name} 不合格或是空文件'),
     // 文件
-    'F_EXCEED_SIZE': '文件大小不能大于 ' + sizePrettify(host.get('maxbytes')),
-    'F_DUPLICATE': '不允许重复选择文件'
+    'F_EXCEED_SIZE': __('文件大小不能大于 ') + sizePrettify(host.get('maxbytes')),
+    'F_DUPLICATE': __('不允许重复选择文件')
   };
 
   var container = $('<div class="ui-upload-message" />')
@@ -80,7 +81,7 @@ module.exports = function() {
     }
 
     hasErr = true;
-    showMessage(template || '未知错误');
+    showMessage(template || __('未知错误'));
   });
 
   host.on('upload beforeFileQueued', function() {

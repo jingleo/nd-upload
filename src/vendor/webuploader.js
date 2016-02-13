@@ -1696,7 +1696,7 @@
             opts.container = $( opts.id );
 
             if ( !opts.container.length ) {
-                throw new Error('按钮指定错误');
+                throw new Error('Button error');
             }
 
             opts.innerHTML = opts.innerHTML || opts.label ||

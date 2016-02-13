@@ -6,6 +6,7 @@
 'use strict';
 
 var $ = require('jquery');
+var __ = require('nd-i18n');
 var Widget = require('nd-widget');
 var Template = require('nd-template');
 var debug = require('nd-debug');
@@ -234,7 +235,7 @@ var Upload = Widget.extend({
     });
 
     this.on('uploadError', function(file/*, res*/) {
-      debug.error('文件 ' + file.name + ' 上传失败，请检查网络连接');
+      debug.error(__('文件 ') + file.name + __(' 上传失败，请检查网络连接'));
     });
 
     Upload.superclass.setup.call(this);

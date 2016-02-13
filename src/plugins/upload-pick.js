@@ -5,6 +5,7 @@
 
 'use strict';
 
+var __ = require('nd-i18n');
 var $ = require('jquery');
 
 module.exports = function() {
@@ -20,7 +21,7 @@ module.exports = function() {
   uploader
     .addButton($.extend(true, {
       id: uploadQueue ? uploadQueue.element[0] : host.element[0],
-      innerHTML: host.get('trigger').placeholder || '＋',
+      innerHTML: host.get('trigger').placeholder || __('＋'),
       button: pickElem,
       multiple: host.get('multiple'),
       // 移除默认 name="file"

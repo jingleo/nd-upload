@@ -6,12 +6,13 @@
 'use strict';
 
 var $ = require('jquery');
+var __ = require('nd-i18n');
 
 var WebUploader = require('../vendor/webuploader');
 
 module.exports = function() {
   if (!WebUploader.Uploader.support()) {
-    alert('您无法进行下一步操作，因为文件上传功能需要更高版本（或支持 Flash 播放器）的浏览器。');
+    alert(__('您无法进行下一步操作，因为文件上传功能需要更高版本（或支持 Flash 播放器）的浏览器。'));
     throw new Error('WebUploader does not support the browser you are using.');
   }
 
