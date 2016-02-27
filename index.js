@@ -7,9 +7,9 @@
 
 var $ = require('nd-jquery');
 var __ = require('nd-i18n');
+var debug = require('nd-debug');
 var Widget = require('nd-widget');
 var Template = require('nd-template');
-var debug = require('nd-debug');
 
 var Upload = Widget.extend({
 
@@ -316,12 +316,13 @@ var Upload = Widget.extend({
       that.trigger('upload', data);
     });
   },
+
   resortFiles: function(action, element, drop) {
     var files = this.get('files');
     var i;
     var item = null;
     var eleFile = null;
-    var dropFile = null;
+    // var dropFile = null;
     var dropIndex = -1;
 
     for (i = 0; i < files.length; i++) {
@@ -331,13 +332,14 @@ var Upload = Widget.extend({
         break;
       }
     }
+
     // 移除
     files.splice(i, 1);
 
-    for(i=0; i<files.length; i++) {
+    for (i = 0; i < files.length; i++) {
       item = files[i];
-      if (item.id == drop.id) {
-        dropFile = files[i];
+      if (item.id === drop.id) {
+        // dropFile = files[i];
         dropIndex = i;
         break;
       }
@@ -345,8 +347,8 @@ var Upload = Widget.extend({
     //调整位置
     if (action === 'insertBefore') {
       files.splice(dropIndex, 0, eleFile);
-    } else if(action === 'insertAfter') {
-      files.splice(dropIndex+1, 0, eleFile);
+    } else if (action === 'insertAfter') {
+      files.splice(dropIndex + 1, 0, eleFile);
     }
   }
 

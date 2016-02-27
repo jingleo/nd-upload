@@ -1,6 +1,6 @@
 {
   "name": "nd-upload",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "基于 WebUploader 的上传组件",
   "keywords": [],
   "homepage": "https://github.com/ndfront/nd-upload",
@@ -26,9 +26,9 @@
     "nd-debug": "^3.0.0",
     "nd-dns": "^3.0.1",
     "nd-i18n": "^3.0.0",
+    "nd-jquery": "^2.2.2",
     "nd-template": "^3.0.1",
-    "nd-widget": "^3.0.1",
-    "nd-jquery": "^2.2.1"
+    "nd-widget": "^3.0.1"
   },
   "devDependencies": {
     "expect.js": "^0.3.1",

@@ -10,7 +10,7 @@ var UploadFile = require('../modules/upload-file');
 
 var MIME_TYPES = require('../vendor/mimetypes');
 
-var BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
+var BLANK = require('../assets/blank.gif');
 
 module.exports = function() {
   var plugin = this,
