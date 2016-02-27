@@ -5,7 +5,7 @@
 
 'use strict';
 
-var $ = require('jquery');
+var $ = require('nd-jquery');
 var __ = require('nd-i18n');
 var Widget = require('nd-widget');
 var Template = require('nd-template');

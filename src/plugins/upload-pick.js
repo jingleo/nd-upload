@@ -6,7 +6,7 @@
 'use strict';
 
 var __ = require('nd-i18n');
-var $ = require('jquery');
+var $ = require('nd-jquery');
 
 module.exports = function() {
   var plugin = this,

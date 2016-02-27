@@ -108,7 +108,7 @@
         // liwenfu@crossjs.com 2015/3/27 13:49:05
         // 默认引入 jquery
         // For CommonJS and CommonJS-like environments where a proper window is present,
-        module.exports = makeExport(require('jquery'));
+        module.exports = makeExport(require('nd-jquery'));
     } else if ( typeof define === 'function' && define.amd ) {
 
         // Allow using this built library as an AMD module
