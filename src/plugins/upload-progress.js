@@ -10,7 +10,7 @@ module.exports = function() {
     host = plugin.host;
 
   host.on('uploadStart', function(file) {
-     file.widget.$('[data-role="file-progress"]').addClass('active');
+    file.widget.$('[data-role="file-progress"]').addClass('active');
   });
 
   host.on('uploadProgress', function(file, percentage) {
