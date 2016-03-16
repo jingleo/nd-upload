@@ -239,6 +239,11 @@ var Upload = Widget.extend({
     });
 
     Upload.superclass.setup.call(this);
+
+    if ($('[name="__ui_upload_download_iframe"]').length === 0) {
+      // iframe for download
+      $('<iframe class="webuploader-element-invisible" name="__ui_upload_download_iframe"></iframe>').appendTo(document.body);
+    }
   },
 
   // 根据 ID 移除 attrs.files 中对应的文件

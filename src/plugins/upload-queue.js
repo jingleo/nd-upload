@@ -113,7 +113,6 @@ module.exports = function() {
             size: 120
           }, function(file) {
             if (file.src) {
-              file.canDownload = true;
               file.srcDownload = file.src.replace('&size=120', '');
             }
             file.isImage = true;
@@ -122,9 +121,11 @@ module.exports = function() {
         } else {
           host.get('download')(file, {
             attachment: true,
-            name: file.name
+            name: file.name || file.id
           }, function(file) {
-            file.canDownload = true;
+            if (file.src) {
+              file.srcDownload = file.src;
+            }
             makeThumb(file, widget);
           });
         }
