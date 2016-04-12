@@ -42,6 +42,7 @@ module.exports = function() {
   host.on('upload', function(data) {
     core.option('server', data.server);
     core.option('formData', data.formData);
+    core.option('headers', data.headers);
     core.upload();
   });
 
