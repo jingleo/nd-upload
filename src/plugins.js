@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 module.exports = [
   {
@@ -21,4 +21,4 @@ module.exports = [
     name: 'uploadMessage',
     starter: require('./plugins/upload-message')
   }
-];
+]

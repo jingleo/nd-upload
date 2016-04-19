@@ -3,21 +3,21 @@
  * @author crossjs <liwenfu@crossjs.com>
  */
 
-'use strict';
+'use strict'
 
-var $ = require('nd-jquery');
-var __ = require('nd-i18n');
+var $ = require('nd-jquery')
+var __ = require('nd-i18n')
 
-var WebUploader = require('../vendor/webuploader');
+var WebUploader = require('../vendor/webuploader')
 
 module.exports = function() {
   if (!WebUploader.Uploader.support()) {
-    alert(__('您无法进行下一步操作，因为文件上传功能需要更高版本（或支持 Flash 播放器）的浏览器。'));
-    throw new Error('WebUploader does not support the browser you are using.');
+    alert(__('您无法进行下一步操作，因为文件上传功能需要更高版本（或支持 Flash 播放器）的浏览器。'))
+    throw new Error('WebUploader does not support the browser you are using.')
   }
 
   var plugin = this,
-    host = plugin.host;
+    host = plugin.host
 
   var core = plugin.exports = WebUploader.create($.extend(true, {
     thumb: {
@@ -35,21 +35,21 @@ module.exports = function() {
     fileNumLimit: host.get('maxcount')
   }, host.get('core'))).on('all', function() {
     // 所有事件同步到 host
-    return host.trigger.apply(host, arguments);
-  });
+    return host.trigger.apply(host, arguments)
+  })
 
   // 上传
   host.on('upload', function(data) {
-    core.option('server', data.server);
-    core.option('formData', data.formData);
-    core.option('headers', data.headers);
-    core.upload();
-  });
+    core.option('server', data.server)
+    core.option('formData', data.formData)
+    core.option('headers', data.headers)
+    core.upload()
+  })
 
   host.before('destroy', function() {
-    plugin.exports && plugin.exports.destroy();
-  });
+    plugin.exports && plugin.exports.destroy()
+  })
 
   // 通知就绪
-  this.ready();
-};
+  this.ready()
+}

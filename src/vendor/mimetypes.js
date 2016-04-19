@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 module.exports = {
   'text/html': 'html',
@@ -125,4 +125,4 @@ module.exports = {
   'xml': 'xml',
   'yml': 'yml',
   'zip': 'zip'
-};
+}

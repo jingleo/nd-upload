@@ -3,32 +3,32 @@
  * @author crossjs <liwenfu@crossjs.com>
  */
 
-'use strict';
+'use strict'
 
-var $ = require('nd-jquery');
-var __ = require('nd-i18n');
+var $ = require('nd-jquery')
+var __ = require('nd-i18n')
 
 function sizePrettify(size) {
-  var ENUM = [' B', ' KB', ' MB', ' GB', ' TB'];
+  var ENUM = [' B', ' KB', ' MB', ' GB', ' TB']
 
   var i = 0,
-    kilo = 1024;
+    kilo = 1024
 
   while (size > kilo) {
-    size /= kilo;
-    i++;
+    size /= kilo
+    i++
   }
 
-  return size.toFixed(2).replace(/\.00|0$/g, '') + ENUM[i];
+  return size.toFixed(2).replace(/\.00|0$/g, '') + ENUM[i]
 }
 
 module.exports = function() {
   var plugin = this,
-    host = plugin.host;
+    host = plugin.host
 
-  var hasErr;
-  var restoreValue;
-  var maxcount = host.get('maxcount');
+  var hasErr
+  var restoreValue
+  var maxcount = host.get('maxcount')
 
   var _messages = {
     'Q_EMPTY': __('请选择上传文件'),
@@ -41,55 +41,55 @@ module.exports = function() {
     // 文件
     'F_EXCEED_SIZE': __('文件大小不能大于 ') + sizePrettify(host.get('maxbytes')),
     'F_DUPLICATE': __('不允许重复选择文件')
-  };
+  }
 
   var container = $('<div class="ui-upload-message" />')
     .on('mouseout', function(e) {
       setTimeout(function() {
-        e.target.style.display = 'none';
+        e.target.style.display = 'none'
         if (restoreValue) {
-          restoreValue = false;
-          host.set('value', '');
+          restoreValue = false
+          host.set('value', '')
         }
-      }, 500);
+      }, 500)
     })
-    .appendTo(host.element);
+    .appendTo(host.element)
 
   var showMessage = function(text) {
     if (!host.get('value')) {
-      restoreValue = true;
-      host.set('value', 'fake');
+      restoreValue = true
+      host.set('value', 'fake')
     }
 
-    container.text(text).show();
-  };
+    container.text(text).show()
+  }
 
   var hideMessage = function(text) {
-    container.text(text).hide();
-    host._blurTrigger();
-  };
+    container.text(text).hide()
+    host._blurTrigger()
+  }
 
   host.on('error', function(type, arg1) {
-    var template = _messages[type];
+    var template = _messages[type]
 
     if (template) {
       if (/\{.+\}/.test(template)) {
         template = template.replace(/\{(.+?)\}/, function(_, $1) {
-          return arg1 && arg1[$1] || '';
-        });
+          return arg1 && arg1[$1] || ''
+        })
       }
     }
 
-    hasErr = true;
-    showMessage(template || __('未知错误'));
-  });
+    hasErr = true
+    showMessage(template || __('未知错误'))
+  })
 
   host.on('upload beforeFileQueued', function() {
     if (hasErr) {
-      hasErr = false;
-      hideMessage('');
+      hasErr = false
+      hideMessage('')
     }
-  });
+  })
 
   // 当且仅当设置了最大数量
   if (maxcount) {
@@ -97,16 +97,16 @@ module.exports = function() {
     // 实际应用时，maxcount 包括已上传文件。需要额外判断
     host.on('beforeFileQueued', function() {
       if (host.get('files').length >= maxcount) {
-        host.trigger('error', 'Q_EXCEED_NUM_LIMIT');
-        return false;
+        host.trigger('error', 'Q_EXCEED_NUM_LIMIT')
+        return false
       }
-    });
+    })
   }
 
   host.before('destroy', function() {
-    container.off().remove();
-  });
+    container.off().remove()
+  })
 
   // 通知就绪
-  this.ready();
-};
+  this.ready()
+}

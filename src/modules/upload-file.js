@@ -3,10 +3,10 @@
  * @author crossjs <liwenfu@crossjs.com>
  */
 
-'use strict';
+'use strict'
 
-var Widget = require('nd-widget');
-var Template = require('nd-template');
+var Widget = require('nd-widget')
+var Template = require('nd-template')
 
 var UploadFile = Widget.extend({
 
@@ -35,17 +35,17 @@ var UploadFile = Widget.extend({
   // },
 
   setup: function() {
-    this._renderPartial(this.get('model'));
+    this._renderPartial(this.get('model'))
   },
 
   update: function(file) {
-    this._renderPartial(file);
+    this._renderPartial(file)
   },
 
   _renderPartial: function(file) {
-    this.renderPartialTemplate('content', file);
+    this.renderPartialTemplate('content', file)
   }
 
-});
+})
 
-module.exports = UploadFile;
+module.exports = UploadFile

@@ -1,6 +1,6 @@
 {
   "name": "nd-upload",
-  "version": "3.0.5",
+  "version": "3.0.7",
   "description": "基于 WebUploader 的上传组件",
   "keywords": [],
   "homepage": "https://github.com/ndfront/nd-upload",
@@ -9,6 +9,9 @@
     "email": "liwenfu@crossjs.com"
   },
   "scripts": {
+    "prepublish": "npm run lint",
+    "lint": "eslint .",
+    "lint:fix": "npm run lint -- --fix",
     "test": "node ./node_modules/karma/bin/karma start ./karma.conf.js",
     "test:dev": "npm run test -- --watch"
   },
