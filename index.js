@@ -93,7 +93,9 @@ var Upload = Widget.extend({
       value: null, // required
       getter: function(val, key) {
         if (!val) {
-          var _val = this.get('trigger').accept
+          var trigger = this.get('trigger')
+          var _val = this.get('trigger').accept;
+          trigger.accept = ''
 
           val = {
             title: this.get('title'),
