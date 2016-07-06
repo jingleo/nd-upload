@@ -182,12 +182,14 @@ var Upload = Widget.extend({
     // 模板
     template: require('./src/upload.handlebars'),
     processFile: function(file, res) {
-      if (res && res['dentry_id']) {
+      var val = this.get('pathKey')(res)
+      // if (res && res['dentry_id']) {
+      if (val) {
         var files = this.get('files')
         // 将指定返回值赋与对应项
         for (var i = 0; i < files.length; i++) {
           if (files[i].id === file.id) {
-            files[i].value = res['dentry_id']
+            files[i].value = val
             break
           }
         }
@@ -206,6 +208,9 @@ var Upload = Widget.extend({
     session: function(callback) {
       callback(false)
     },
+    pathKey: function(res) {
+      return res ? res['dentry_id'] : ''
+    },
     // detail: function(file, callback) {
     //   callback(false);
     // },
@@ -219,7 +224,7 @@ var Upload = Widget.extend({
       value: null,
       setter: function(val/*, key*/) {
         if (val) {
-          ['session', 'detail', 'upload', 'download']
+          ['session', 'pathKey', 'detail', 'upload', 'download']
           .forEach(function(key) {
             if (val[key]) {
               this.set(key, val[key].bind(val))
