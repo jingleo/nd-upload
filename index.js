@@ -10,6 +10,7 @@ var __ = require('nd-i18n')
 var debug = require('nd-debug')
 var Widget = require('nd-widget')
 var Template = require('nd-template')
+var Queue = require('nd-queue')
 
 var Upload = Widget.extend({
 
@@ -150,6 +151,26 @@ var Upload = Widget.extend({
         return val
       }
     },
+    md5: {//
+      value: null, // required
+      getter: function(val, key) {
+        if (typeof val !== 'number') {
+          this.attrs[key].value = val = +this.get('trigger').getAttribute('md5')
+        }
+
+        return val
+      }
+    },
+    quick: { // 是否开启秒传
+      value: null,
+      getter: function(val, key) {
+        if (typeof val !== 'boolean') {
+          this.attrs[key].value = val = !!(this.get('trigger').getAttribute('quick') || this.get('trigger').getAttribute('quick'))
+        }
+
+        return val
+      }
+    },
     maxcount: {
       value: null, // required
       getter: function(val, key) {
@@ -224,7 +245,7 @@ var Upload = Widget.extend({
       value: null,
       setter: function(val/*, key*/) {
         if (val) {
-          ['session', 'pathKey', 'detail', 'upload', 'download']
+          ['session', 'pathKey', 'detail', 'upload', 'download', 'quickUpload']
           .forEach(function(key) {
             if (val[key]) {
               this.set(key, val[key].bind(val))
@@ -295,6 +316,14 @@ var Upload = Widget.extend({
       return callback && callback()
     }
 
+    function quickUpload(file, cb) {
+      that.get('quickUpload')(file, function(res) {
+        res && that.get('processFile').call(that, file, res)
+
+        cb(res)
+      })
+    }
+
     function complete() {
       var hasErr = false
       var value = that._getFilesValue()
@@ -310,14 +339,40 @@ var Upload = Widget.extend({
       callback && callback(hasErr)
     }
 
+    var files = this.get('files')
+    var totalFile = files.length
+
     // 如果队列文件为空
-    if (!this.get('files').some(function(file) { return !!file.source })) {
+    if (!files.some(function(file) { return !!file.source })) {
       return complete()
     }
 
-    this.once('uploadFinished', complete)
+    var index = 0
+    var queue = new Queue()
+    var quickFlag = this.get('quick')
 
-    this.upload()
+    if(quickFlag) {
+      files.forEach(function (file, i) {
+        queue.use(function (next) {
+          quickUpload(file, function(res){
+            res && index++
+            next()
+          })
+        })
+      })
+
+      queue.all(function(){
+        index === totalFile && complete()
+
+        if (index < totalFile) {
+          that.once('uploadFinished', complete)
+          that.upload()
+        }
+      })
+    } else {
+      that.once('uploadFinished', complete)
+      that.upload()
+    }
   },
 
   upload: function() {

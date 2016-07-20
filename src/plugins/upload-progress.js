@@ -23,6 +23,20 @@ module.exports = function() {
     progressbar.removeClass('active').html('<span class="iconfont iconfont-ok"></span>')
   })
 
+  host.on('md5Start', function(file) {
+    file.widget.$('[data-role="file-progress"]').addClass('active')
+  })
+
+  host.on('md5Progress', function(file, percentage) {
+    var progressbar = file.widget.$('[data-role="file-progress"]')
+    progressbar.css('width', (1 - percentage) * 100 + '%')
+  })
+
+  host.on('md5Success', function(file) {
+    var progressbar = file.widget.$('[data-role="file-progress"]')
+    progressbar.removeClass('active')
+  })
+
   // 通知就绪
   this.ready()
 }

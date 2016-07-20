@@ -31,26 +31,17 @@ module.exports = function() {
   var maxcount = host.get('maxcount')
 
   // 文件最大数限制
-  var files = host.get('files')
-
   function togglePick() {
+    var files = host.get('files');
     pickElem.toggleClass(
       'webuploader-element-invisible', files.length >= maxcount)
 
     host.set('value', files.length ? 'fake' : '')
   }
 
-  host.on('fileQueued', function(file) {
-    // 来自文件系统选取
-    if (file.source) {
-      files.push({
-        source: file.source,
-        id: file.id
-      })
-    }
-
+  host.on('fileAnalysis', function() {
     maxcount && togglePick()
-  })
+  });
 
   host.on('fileDequeued', function(file) {
     host.removeFile(file.id)

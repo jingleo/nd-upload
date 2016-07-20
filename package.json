@@ -27,6 +27,7 @@
     "nd-dns": "^3.0.1",
     "nd-i18n": "^3.0.0",
     "nd-jquery": "^2.2.2",
+    "nd-queue": "^3.0.0",
     "nd-template": "^3.0.1",
     "nd-widget": "^3.0.2"
   },

@@ -20,23 +20,27 @@ module.exports = function() {
     host = plugin.host
 
   var core = plugin.exports = WebUploader.create($.extend(true, {
-    thumb: {
-      // 内容服务，仅支持 80,120,160,240,320,480,640,960
-      width: 120,
-      height: 120,
-      quality: 100,
-      // 必须 jpeg 否则 flash 环境下无法显示 png
-      type: 'jpeg'
-    },
-    swf: host.get('swf'),
-    // runtimeOrder: 'flash, html5',
-    accept: host.get('accept'),
-    fileSingleSizeLimit: host.get('maxbytes'),
-    fileNumLimit: host.get('maxcount')
-  }, host.get('core'))).on('all', function() {
-    // 所有事件同步到 host
-    return host.trigger.apply(host, arguments)
-  })
+      thumb: {
+        // 内容服务，仅支持 80,120,160,240,320,480,640,960
+        width: 120,
+        height: 120,
+        quality: 100,
+        // 必须 jpeg 否则 flash 环境下无法显示 png
+        type: 'jpeg'
+      },
+      swf: host.get('swf'),
+      // runtimeOrder: 'flash, html5',
+      accept: host.get('accept'),
+      fileSingleSizeLimit: host.get('maxbytes'),
+      fileNumLimit: host.get('maxcount'),
+      chunked: true,
+      chunkSize: host.get('chunkSize'),
+      compress: false // 增加图片默认不压缩选项
+    }, host.get('core')))
+    .on('all', function() {
+      // 所有事件同步到 host
+      return host.trigger.apply(host, arguments)
+    });
 
   // 上传
   host.on('upload', function(data) {
@@ -44,6 +48,9 @@ module.exports = function() {
     core.option('formData', data.formData)
     core.option('headers', data.headers)
     core.upload()
+  })
+  host.off('fileInit').on('fileInit', function(file){
+    core.addFiles(file)
   })
 
   host.before('destroy', function() {

@@ -61,10 +61,41 @@ module.exports = function() {
   }
 
   function makeThumb(file, widget) {
+    // 文件最大数限制
+    var files = host.get('files')
+
     function update() {
       widget.update(file)
       file.widget = widget
       host.trigger('fileRendered', file)
+
+      if(host.get('quick') && file.source) {
+        makeMd5()
+      } else {
+        file.source && files.push({
+          source: file.source,
+          id: file.id
+        })
+        host.trigger('fileAnalysis')
+      }
+    }
+
+    function makeMd5() {
+      host.trigger('md5Start', file);
+      uploader.md5File(file)
+      .progress(function(percentage) {
+        host.trigger('md5Progress', file, percentage);
+      })
+      .then(function(md5){
+        files.push({
+          source: file.source,
+          name: file.name,
+          md5: md5,
+          id: file.id
+        });
+        host.trigger('fileAnalysis');
+        host.trigger('md5Success', file);
+      });
     }
 
     if (file.isImage) {
